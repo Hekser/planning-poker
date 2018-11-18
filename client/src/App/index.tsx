@@ -1,9 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+
+import { StartPage } from "../StartPage";
+import { RoomPage } from "../Room/RoomPage";
 
 class App extends Component {
   render() {
     return (
-      <div>_APP_</div>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/room" component={RoomPage} />
+          <Route path="/" component={StartPage} />
+        </Switch>
+      </BrowserRouter>
     );
   }
 }
