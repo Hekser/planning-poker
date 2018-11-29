@@ -16,6 +16,15 @@ namespace PlanningPoker
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddPolicy("AllowAny", builder =>
+            {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowAnyOrigin()
+                .AllowCredentials();
+            }));
+            
             services.AddSignalR();
         }
 
@@ -26,6 +35,8 @@ namespace PlanningPoker
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("AllowAny");
 
             app.UseSignalR(routes =>
             {
