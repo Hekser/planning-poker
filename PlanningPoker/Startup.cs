@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using PlanningPoker.Hubs;
 
-namespace PlanningPoker.WebApi
+namespace PlanningPoker
 {
     public class Startup
     {
@@ -15,6 +16,16 @@ namespace PlanningPoker.WebApi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddPolicy("AllowAny", builder =>
+            {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowAnyOrigin()
+                .AllowCredentials();
+            }));
+            
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -24,6 +35,13 @@ namespace PlanningPoker.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("AllowAny");
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<RoomHub>("/roomHub");
+            });
 
             app.Run(async (context) =>
             {

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace PlanningPoker.WebApi
+namespace PlanningPoker
 {
     public class Program
     {
@@ -19,6 +19,7 @@ namespace PlanningPoker.WebApi
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseUrls("http://localhost:7000")
                 .UseStartup<Startup>();
     }
 }
