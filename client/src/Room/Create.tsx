@@ -1,3 +1,7 @@
-import React from 'react'
+import React from "react";
 
-export const Create = () => <div>_CREATE_ROOM_</div>
+import { EnterForm } from "./EnterForm";
+
+export const Create = () => (
+  <EnterForm type="create" onSubmit={values => console.log(values)} />
+);

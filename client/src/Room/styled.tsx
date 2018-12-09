@@ -29,3 +29,11 @@ export const StartButtonsWrapper = styled.div`
 
 export const JoinButton = styled(Button)``;
 export const CreateButton = styled(Button)``;
+
+export const EnterFormWrapper = styled.div`
+  & > form {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+export const EnterFormSubmitButton = styled(Button)``;

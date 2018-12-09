@@ -1,3 +1,7 @@
-import React from 'react'
+import React from "react";
 
-export const Join = () => <div>_JOIN_ROOM_</div>
+import { EnterForm } from "./EnterForm";
+
+export const Join = () => (
+  <EnterForm type="join" onSubmit={values => console.log(values)} />
+);
