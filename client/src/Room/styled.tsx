@@ -1,21 +1,15 @@
 import styled from "styled-components";
+
 import { Button } from "../Common/Button";
+import { PaneStyles } from "../Common/styles";
 
 export const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-`;
-
-export const Content = styled.div`
-  width: 100%;
-  height: 100%;
   background-color: #eeeeee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  height: 100%;
 `;
 
 export const Title = styled.h1`
@@ -32,11 +26,9 @@ export const JoinButton = styled(Button)``;
 export const CreateButton = styled(Button)``;
 
 export const EnterFormWrapper = styled.div`
-  background-color: white;
-  border-radius: 2px;
   width: 96%;
   max-width: 480px;
-  padding: 3% 4%;
+  ${PaneStyles};
   & > form {
     display: flex;
     flex-direction: column;

@@ -15,7 +15,7 @@ const StyledButton = styled.button`
 const PrimaryButton = styled(StyledButton)`
   background-color: #9977cc;
   border-color: #8866bb;
-  color: whitesmoke;
+  color: white;
   text-transform: uppercase;
   font-weight: bolder;
   &:hover {
