@@ -9,9 +9,11 @@ export const Start = withRouter(({ history }) => (
     <Title>Planning poker</Title>
     <StartButtonsWrapper>
       <CreateButton onClick={() => history.push(CREATE_ROOM_PATH)}>
-        Create
+        Stwórz pokój
       </CreateButton>
-      <JoinButton onClick={() => history.push(JOIN_ROOM_PATH)}>Join</JoinButton>
+      <JoinButton onClick={() => history.push(JOIN_ROOM_PATH)}>
+        Dołącz do pokoju
+      </JoinButton>
     </StartButtonsWrapper>
   </div>
 ));

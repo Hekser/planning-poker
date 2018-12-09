@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import { EnterFormWrapper, EnterFormSubmitButton } from "./styled";
+import {
+  EnterFormWrapper,
+  EnterFormSubmitButton,
+  EnterFormGroup,
+  EnterFormLabel
+} from "./styled";
 import { Input } from "../Common/Input";
 
 export interface EnterFormProps {
@@ -11,6 +16,11 @@ export interface EnterFormState {
   roomName: string;
   nickname: string;
 }
+
+const t = {
+  create: "stwórz pokój",
+  join: "dołącz do pokoju"
+};
 
 export class EnterForm extends Component<EnterFormProps, EnterFormState> {
   state: EnterFormState = {
@@ -28,15 +38,26 @@ export class EnterForm extends Component<EnterFormProps, EnterFormState> {
             onSubmit(this.state);
           }}
         >
-          <Input
-            value={this.state.nickname}
-            onChange={e => this.setState({ nickname: e.target.value })}
-          />
-          <Input
-            value={this.state.roomName}
-            onChange={e => this.setState({ roomName: e.target.value })}
-          />
-          <EnterFormSubmitButton>{type}</EnterFormSubmitButton>
+          <EnterFormGroup>
+            <EnterFormLabel>
+              Nick
+              <Input
+                value={this.state.nickname}
+                onChange={e => this.setState({ nickname: e.target.value })}
+              />
+            </EnterFormLabel>
+          </EnterFormGroup>
+          <EnterFormGroup>
+            <EnterFormLabel>
+              Nazwa pokoju
+              <Input
+                value={this.state.roomName}
+                onChange={e => this.setState({ roomName: e.target.value })}
+              />
+            </EnterFormLabel>
+          </EnterFormGroup>
+
+          <EnterFormSubmitButton>{t[type]}</EnterFormSubmitButton>
         </form>
       </EnterFormWrapper>
     );
