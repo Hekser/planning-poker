@@ -1,19 +1,23 @@
 import React, { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
+import "./style.css";
 import { Chat } from "../Chat/Chat";
-import { StartPage } from "../StartPage";
-import { RoomPage } from "../Room/RoomPage";
+import { Room } from "../Room";
+import { ROOM_PATH } from "../paths";
+import { AppWrapper } from "./styled";
 
 class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <Switch>
-          <Route path="/chat" component={Chat} />
-          <Route path="/room" component={RoomPage} />
-          <Route path="/" component={StartPage} />
-        </Switch>
+        <AppWrapper>
+          <Switch>
+            <Route path="/chat" component={Chat} />
+            <Route path={ROOM_PATH} component={Room} />
+            <Route path="/" component={Room} />
+          </Switch>
+        </AppWrapper>
       </BrowserRouter>
     );
   }
