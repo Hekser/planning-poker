@@ -1,5 +1,7 @@
 import React, { Component, ReactNode } from "react";
 import * as SignalR from "@aspnet/signalr";
+import { withRouter, RouteComponentProps } from "react-router";
+import { ROOM_PATH } from "../../paths";
 
 const HUB_URL = "http://localhost:7000/roomHub";
 
@@ -18,7 +20,7 @@ interface SignalRHOCState {
   messages: string[];
 }
 
-export class WithSignalR extends Component<SignalRHOCProps, SignalRHOCState> {
+class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentProps, SignalRHOCState> {
   static connection: SignalR.HubConnection;
 
   state: SignalRHOCState = {
@@ -28,33 +30,39 @@ export class WithSignalR extends Component<SignalRHOCProps, SignalRHOCState> {
   constructor(props) {
     super(props);
 
-    if (!WithSignalR.connection) {
-      WithSignalR.connection = new SignalR.HubConnectionBuilder()
+    const { history } = this.props;
+
+    if (!WithSignalRComponent.connection) {
+      WithSignalRComponent.connection = new SignalR.HubConnectionBuilder()
         .withUrl(HUB_URL)
         .build();
 
-      WithSignalR.connection.on("receiveMessage", message => {
+      WithSignalRComponent.connection.on("receiveMessage", message => {
         this.setState({
           messages: [...this.state.messages, `${message}`]
         });
       });
 
-      WithSignalR.connection.on("generateRoomName", roomName => {
+      WithSignalRComponent.connection.on("generateRoomName", roomName => {
         this.setState({
           messages: [...this.state.messages, `Created room ${roomName}`]
         });
       });
 
-      WithSignalR.connection.on("memberJoined", res => {
+      WithSignalRComponent.connection.on("memberJoined", res => {
         this.setState({ messages: [...this.state.messages, `${res}`] });
       });
 
-      WithSignalR.connection.start();
+      WithSignalRComponent.connection.on("createRoom", res => {
+        history.push(`${ROOM_PATH}/${res}`)
+      });
+
+      WithSignalRComponent.connection.start();
     }
   }
 
   createRoom: CreateRoomMethod = (nickname, roomName) =>
-    WithSignalR.connection.invoke("createRoom", nickname, roomName);
+    WithSignalRComponent.connection.invoke("createRoom", nickname, roomName);
 
   render() {
     return this.props.children({
@@ -63,3 +71,5 @@ export class WithSignalR extends Component<SignalRHOCProps, SignalRHOCState> {
     });
   }
 }
+
+export const WithSignalR = withRouter(WithSignalRComponent)
