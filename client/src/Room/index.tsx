@@ -7,6 +7,7 @@ import { Create } from "./Create";
 import { Join } from "./Join";
 import { Start } from "./Start";
 import { RoomEntry } from "./Entry";
+import { WithSignalR } from "../HOC/SignalR";
 
 export const Room = withRouter(({ match }) => (
   <Wrapper>
@@ -16,5 +17,6 @@ export const Room = withRouter(({ match }) => (
       <Route path={`${JOIN_ROOM_PATH}`} component={Join} />
       <Route path={`${ROOM_PATH}/:roomId`} component={RoomEntry} />
     </Switch>
+    <WithSignalR>{({messages}) => messages}</WithSignalR>
   </Wrapper>
 ));

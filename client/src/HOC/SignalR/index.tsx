@@ -3,8 +3,11 @@ import * as SignalR from "@aspnet/signalr";
 
 const HUB_URL = "http://localhost:7000/roomHub";
 
+type CreateRoomMethod = (nickname: string, roomName: string) => void;
+
 interface SignalRHOCMethods {
   messages: string[];
+  createRoom: CreateRoomMethod;
 }
 
 export interface SignalRHOCProps {
@@ -30,9 +33,9 @@ export class WithSignalR extends Component<SignalRHOCProps, SignalRHOCState> {
         .withUrl(HUB_URL)
         .build();
 
-      WithSignalR.connection.on("receiveMessage", (user, message) => {
+      WithSignalR.connection.on("receiveMessage", message => {
         this.setState({
-          messages: [...this.state.messages, `${user}: ${message}`]
+          messages: [...this.state.messages, `${message}`]
         });
       });
 
@@ -50,7 +53,13 @@ export class WithSignalR extends Component<SignalRHOCProps, SignalRHOCState> {
     }
   }
 
+  createRoom: CreateRoomMethod = (nickname, roomName) =>
+    WithSignalR.connection.invoke("createRoom", nickname, roomName);
+
   render() {
-    return this.props.children({ messages: this.state.messages });
+    return this.props.children({
+      messages: this.state.messages,
+      createRoom: this.createRoom
+    });
   }
 }

@@ -1,7 +1,15 @@
 import React from "react";
 
 import { EnterForm } from "./EnterForm";
+import { WithSignalR } from "../HOC/SignalR";
 
 export const Create = () => (
-  <EnterForm type="create" onSubmit={values => console.log(values)} />
+  <WithSignalR>
+    {({ createRoom }) => (
+      <EnterForm
+        type="create"
+        onSubmit={values => createRoom(values.nickname, values.roomName)}
+      />
+    )}
+  </WithSignalR>
 );
