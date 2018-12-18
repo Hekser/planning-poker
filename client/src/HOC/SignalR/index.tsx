@@ -7,11 +7,25 @@ const HUB_URL = "http://localhost:7000/roomHub";
 
 type CreateRoomMethod = (nickname: string, roomName: string) => void;
 type JoinRoomMethod = (values: { nickname: string, roomName: string }) => void;
+type RefreshRoomMethod = (values: { roomName: string }) => void;
+
+export interface Member {
+  MemberId: string;
+  Nick: string;
+  Role: MemberRole
+}
+
+export enum MemberRole {
+  "Admin" = 1,
+  "Member" = 2
+}
 
 interface SignalRHOCMethods {
   messages: string[];
   createRoom: CreateRoomMethod;
   joinRoom: JoinRoomMethod;
+  refreshRoom: RefreshRoomMethod;
+  members: Member[]
 }
 
 export interface SignalRHOCProps {
@@ -20,13 +34,15 @@ export interface SignalRHOCProps {
 
 interface SignalRHOCState {
   messages: string[];
+  members: Member[];
 }
 
 class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentProps, SignalRHOCState> {
   static connection: SignalR.HubConnection;
 
   state: SignalRHOCState = {
-    messages: []
+    messages: [],
+    members: []
   };
 
   constructor(props) {
@@ -55,12 +71,20 @@ class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentPro
         this.setState({ messages: [...this.state.messages, `${res}`] });
       });
 
+      // IN USE:
+
       WithSignalRComponent.connection.on("createRoom", res => {
         history.push(`${ROOM_PATH}/${res}`)
       });
 
       WithSignalRComponent.connection.on("joinRoom", res => {
         history.push(`${ROOM_PATH}/${res}`)
+        this.refreshRoom({ roomName: res })
+      });
+
+      WithSignalRComponent.connection.on("refreshRoom", members => {
+        console.log(members)
+        this.setState({ members })
       });
 
       WithSignalRComponent.connection.start();
@@ -73,11 +97,15 @@ class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentPro
   joinRoom: JoinRoomMethod = ({ nickname, roomName }) =>
     WithSignalRComponent.connection.invoke("joinRoom", nickname, roomName);
 
+  refreshRoom: RefreshRoomMethod = ({ roomName }) => { console.log("Refresh room", roomName); WithSignalRComponent.connection.invoke("refreshRoom", roomName); }
+
   render() {
     return this.props.children({
       messages: this.state.messages,
       createRoom: this.createRoom,
-      joinRoom: this.joinRoom
+      joinRoom: this.joinRoom,
+      refreshRoom: this.refreshRoom,
+      members: this.state.members
     });
   }
 }

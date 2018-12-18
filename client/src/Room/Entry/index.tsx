@@ -3,6 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router";
 
 import { User } from "./interfaces";
 import { GetReady } from "./GetReady";
+import { WithSignalR } from "../../HOC/SignalR";
 
 export interface RoomEntryState {
   roomStatus: "beforeStart" | "duringPlanning" | "planningFinished";
@@ -10,7 +11,7 @@ export interface RoomEntryState {
 }
 
 export interface RoomEntryProps
-  extends RouteComponentProps<{ roomId: string }> {}
+  extends RouteComponentProps<{ roomId: string }> { }
 
 class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
   state: RoomEntryState = {
