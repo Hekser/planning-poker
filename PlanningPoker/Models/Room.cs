@@ -9,6 +9,6 @@ namespace PlanningPoker.Models
         
         public string RoomName { get; set; }
 
-        public IEnumerable<Member> Members { get; set; }
+        public IList<Member> Members { get; set; }
     }
 }
