@@ -6,10 +6,12 @@ import { ROOM_PATH } from "../../paths";
 const HUB_URL = "http://localhost:7000/roomHub";
 
 type CreateRoomMethod = (nickname: string, roomName: string) => void;
+type JoinRoomMethod = (values: { nickname: string, roomName: string }) => void;
 
 interface SignalRHOCMethods {
   messages: string[];
   createRoom: CreateRoomMethod;
+  joinRoom: JoinRoomMethod;
 }
 
 export interface SignalRHOCProps {
@@ -57,6 +59,10 @@ class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentPro
         history.push(`${ROOM_PATH}/${res}`)
       });
 
+      WithSignalRComponent.connection.on("joinRoom", res => {
+        history.push(`${ROOM_PATH}/${res}`)
+      });
+
       WithSignalRComponent.connection.start();
     }
   }
@@ -64,10 +70,14 @@ class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentPro
   createRoom: CreateRoomMethod = (nickname, roomName) =>
     WithSignalRComponent.connection.invoke("createRoom", nickname, roomName);
 
+  joinRoom: JoinRoomMethod = ({ nickname, roomName }) =>
+    WithSignalRComponent.connection.invoke("joinRoom", nickname, roomName);
+
   render() {
     return this.props.children({
       messages: this.state.messages,
-      createRoom: this.createRoom
+      createRoom: this.createRoom,
+      joinRoom: this.joinRoom
     });
   }
 }
