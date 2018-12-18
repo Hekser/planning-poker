@@ -15,7 +15,7 @@ namespace PlanningPoker.Hubs
 
     public override async Task OnConnectedAsync()
     {
-      await Clients.All.SendAsync("ReceiveMessage", "test");
+      await Clients.All.SendAsync("ReceiveMessage", "Connected");
       await base.OnConnectedAsync();
     }
 
@@ -38,7 +38,7 @@ namespace PlanningPoker.Hubs
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
         await Clients.Group(roomName).SendAsync("RefreshRoomMembers", JsonConvert.SerializeObject(storage.GetRoomMembers(roomName)));
         await Clients.All.SendAsync("ReceiveMessage", "Created room: " + roomName);
-        // await Clients.Caller.SendAsync("GenerateRoomName", $"room-{DateTime.Now}");
+        await Clients.Caller.SendAsync("CreateRoom");
       });
     }
 
