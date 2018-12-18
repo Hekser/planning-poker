@@ -36,9 +36,7 @@ namespace PlanningPoker.Hubs
       {
         storage.CreateRoom(roomName, new Member() { Nick = nickName, Role = Role.Admin, MemberId = Context.ConnectionId });
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
-        await Clients.Group(roomName).SendAsync("RefreshRoomMembers", JsonConvert.SerializeObject(storage.GetRoomMembers(roomName)));
-        await Clients.All.SendAsync("ReceiveMessage", "Created room: " + roomName);
-        await Clients.Caller.SendAsync("CreateRoom");
+        await Clients.Caller.SendAsync("CreateRoom", roomName);
       });
     }
 
@@ -48,7 +46,15 @@ namespace PlanningPoker.Hubs
       {
         storage.AddMember(roomName, new Member() { Nick = nickName, Role = Role.Member, MemberId = Context.ConnectionId });
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
-        await Clients.Group(roomName).SendAsync("RefreshRoomMembers", JsonConvert.SerializeObject(storage.GetRoomMembers(roomName)));
+        await Clients.Caller.SendAsync("JoinRoom", roomName);
+      });
+    }
+
+    public async Task RefreshRoom(string roomName)
+    {
+      await Execute(async () =>
+      {
+        await Clients.Group(roomName).SendAsync("RefreshRoom", JsonConvert.SerializeObject(storage.GetRoomMembers(roomName)));
       });
     }
 
@@ -65,11 +71,11 @@ namespace PlanningPoker.Hubs
       }
       catch (HubException ex)
       {
-        return Clients.Caller.SendAsync("ReceiveMessage", ex.Message);
+        return Clients.Caller.SendAsync("HandleError", ex.Message);
       }
       catch (Exception)
       {
-        return Clients.Caller.SendAsync("ReceiveMessage", "Ups! Coś poszło nie tak!");
+        return Clients.Caller.SendAsync("HandleError", "Ups! Coś poszło nie tak!");
       }
     }
   }
