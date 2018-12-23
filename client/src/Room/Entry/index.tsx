@@ -3,6 +3,7 @@ import { withRouter, RouteComponentProps } from "react-router";
 
 import { User } from "./interfaces";
 import { GetReady } from "./GetReady";
+import { DuringPlanning } from "./DuringPlanning";
 
 export interface RoomEntryState {
   roomStatus: "beforeStart" | "duringPlanning" | "planningFinished";
@@ -14,7 +15,7 @@ export interface RoomEntryProps
 
 class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
   state: RoomEntryState = {
-    roomStatus: "beforeStart",
+    roomStatus: "duringPlanning",
     users: []
   };
   componentDidMount() {
@@ -47,7 +48,7 @@ class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
       case "beforeStart":
         return <GetReady users={this.state.users} onStart={this.onStart} />;
       case "duringPlanning":
-        return "_PLANNING_";
+        return <DuringPlanning />;
     }
   }
 }
