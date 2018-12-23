@@ -11,7 +11,7 @@ export interface RoomEntryState {
 }
 
 export interface RoomEntryProps
-  extends RouteComponentProps<{ roomId: string }> {}
+  extends RouteComponentProps<{ roomId: string }> { }
 
 class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
   state: RoomEntryState = {

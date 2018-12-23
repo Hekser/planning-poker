@@ -6,7 +6,6 @@ import {
   EnterFormLabel
 } from "./styled";
 import { Input } from "../Common/Input";
-// import * as SignalR from '@aspnet/signalr';
 
 export interface EnterFormProps {
   type: "create" | "join";
@@ -16,7 +15,6 @@ export interface EnterFormProps {
 export interface EnterFormState {
   roomName: string;
   nickname: string;
-  // connection: SignalR.HubConnection;
 }
 
 const t = {
@@ -27,32 +25,8 @@ const t = {
 export class EnterForm extends Component<EnterFormProps, EnterFormState> {
   state: EnterFormState = {
     nickname: "",
-    roomName: "",
-    // connection: new SignalR.HubConnectionBuilder()
-    //   .withUrl("http://localhost:7000/roomHub")
-    //   .build(),
+    roomName: ""
   };
-
-  // componentDidMount = () => {
-  //   this.state.connection.on("receiveMessage", (message) => {
-  //     console.log(message);
-  //   });
- 
-  //   this.state.connection.on("generateRoomName", (roomName) => {
-  //   });
-
-  //   this.state.connection.on("refreshRoomMembers", (res) => {
-  //     console.log(res);
-  //   });
-
-  //   this.state.connection
-  //     .start()
-  //     .catch(err => console.log('Error while establishing connection.'));
-  // }
-  
-  // componentWillUnmount = () => {
-  //   this.state.connection.stop().then(() => {});
-  // }
   
   render() {
     const { type, onSubmit } = this.props;
@@ -62,7 +36,6 @@ export class EnterForm extends Component<EnterFormProps, EnterFormState> {
           onSubmit={values => {
             values.preventDefault();
             onSubmit(this.state);
-            // this.state.connection.invoke("createRoom", this.state.nickname, this.state.roomName);
           }}
         >
           <EnterFormGroup>

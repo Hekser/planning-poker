@@ -40,7 +40,7 @@ namespace PlanningPoker.Logic.Services
 		{
 			validator.CheckIfRoomNameExists(Rooms, roomName);
 
-			Rooms.First(x => x.RoomName == roomName).Members.Append(member);
+			Rooms.First(x => x.RoomName == roomName).Members.Add(member);
 		}
 
 		public IEnumerable<Member> GetRoomMembers(string roomName)
