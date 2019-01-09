@@ -19,11 +19,13 @@ namespace PlanningPoker.Hubs
       await base.OnConnectedAsync();
     }
 
-    // public override async Task OnDisconnectedAsync(Exception exception)
-    // {
-    //     await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
-    //     await base.OnDisconnectedAsync(exception);
-    // }
+    public override async Task OnDisconnectedAsync(Exception exception)
+    {
+      // await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
+      storage.RemoveMember(Context.ConnectionId);
+      // this.RefreshRoom();
+      await base.OnDisconnectedAsync(exception);
+    }
 
     public async Task SendMessage(string user, string message)
     {

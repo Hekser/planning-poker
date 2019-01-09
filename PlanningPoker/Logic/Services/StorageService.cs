@@ -49,5 +49,27 @@ namespace PlanningPoker.Logic.Services
 
 			return Rooms.First(x => x.RoomName == roomName).Members;
 		}
+
+		public void RemoveMember(string connectionId)
+		{
+			var roomsIdsToRemove = new List<int>();
+			
+			foreach (var room in Rooms)
+			{
+				room.Members = room.Members.Where(x => x.MemberId != connectionId).ToList();
+
+				if (room.Members.Count == 0)
+				{
+					roomsIdsToRemove.Add(room.RoomId);
+				}
+			}
+
+			RemoveRooms(roomsIdsToRemove);
+		}
+
+		private void RemoveRooms(IEnumerable<int> roomsIds)
+		{
+			Rooms = Rooms.Where(x => !roomsIds.Contains(x.RoomId)).ToList();
+		}
 	}
 }
