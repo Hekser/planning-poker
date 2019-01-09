@@ -17,6 +17,5 @@ export const Room = withRouter(({ match }) => (
       <Route path={`${JOIN_ROOM_PATH}`} component={Join} />
       <Route path={`${ROOM_PATH}/:roomId`} component={RoomEntry} />
     </Switch>
-    <WithSignalR>{({messages}) => messages}</WithSignalR>
   </Wrapper>
 ));

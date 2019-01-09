@@ -6,13 +6,14 @@ import { ROOM_PATH } from "../../paths";
 const HUB_URL = "http://localhost:7000/roomHub";
 
 type CreateRoomMethod = (nickname: string, roomName: string) => void;
-type JoinRoomMethod = (values: { nickname: string, roomName: string }) => void;
+type JoinRoomMethod = (values: { nickname: string; roomName: string }) => void;
 type RefreshRoomMethod = (values: { roomName: string }) => void;
+type OnRoomRefreshedMethod = (values: { members: Member[] }) => void;
 
 export interface Member {
   MemberId: string;
   Nick: string;
-  Role: MemberRole
+  Role: MemberRole;
 }
 
 export enum MemberRole {
@@ -21,73 +22,52 @@ export enum MemberRole {
 }
 
 interface SignalRHOCMethods {
-  messages: string[];
   createRoom: CreateRoomMethod;
   joinRoom: JoinRoomMethod;
   refreshRoom: RefreshRoomMethod;
-  members: Member[]
 }
 
 export interface SignalRHOCProps {
-  children: (foo: SignalRHOCMethods) => ReactNode;
+  onRoomRefreshed?: OnRoomRefreshedMethod;
+  children?: (props: SignalRHOCMethods) => ReactNode;
 }
 
-interface SignalRHOCState {
-  messages: string[];
-  members: Member[];
-}
+interface SignalRHOCState {}
 
-class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentProps, SignalRHOCState> {
+class WithSignalRComponent extends Component<
+  SignalRHOCProps & RouteComponentProps,
+  SignalRHOCState
+> {
   static connection: SignalR.HubConnection;
-
-  state: SignalRHOCState = {
-    messages: [],
-    members: []
-  };
 
   constructor(props) {
     super(props);
 
-    const { history } = this.props;
+    const { history, onRoomRefreshed } = this.props;
 
     if (!WithSignalRComponent.connection) {
       WithSignalRComponent.connection = new SignalR.HubConnectionBuilder()
         .withUrl(HUB_URL)
         .build();
 
-      WithSignalRComponent.connection.on("receiveMessage", message => {
-        this.setState({
-          messages: [...this.state.messages, `${message}`]
-        });
-      });
-
-      WithSignalRComponent.connection.on("generateRoomName", roomName => {
-        this.setState({
-          messages: [...this.state.messages, `Created room ${roomName}`]
-        });
-      });
-
-      WithSignalRComponent.connection.on("memberJoined", res => {
-        this.setState({ messages: [...this.state.messages, `${res}`] });
-      });
-
-      // IN USE:
-
       WithSignalRComponent.connection.on("createRoom", res => {
-        history.push(`${ROOM_PATH}/${res}`)
+        history.push(`${ROOM_PATH}/${res}`);
+        this.refreshRoom({ roomName: res });
       });
 
       WithSignalRComponent.connection.on("joinRoom", res => {
-        history.push(`${ROOM_PATH}/${res}`)
-        this.refreshRoom({ roomName: res })
-      });
-
-      WithSignalRComponent.connection.on("refreshRoom", members => {
-        console.log(members)
-        this.setState({ members })
+        history.push(`${ROOM_PATH}/${res}`);
+        this.refreshRoom({ roomName: res });
       });
 
       WithSignalRComponent.connection.start();
+    }
+
+    if (onRoomRefreshed) {
+      WithSignalRComponent.connection.on("refreshRoom", membersStringify => {
+        const members = JSON.parse(membersStringify);
+        onRoomRefreshed({ members });
+      });
     }
   }
 
@@ -97,17 +77,20 @@ class WithSignalRComponent extends Component<SignalRHOCProps & RouteComponentPro
   joinRoom: JoinRoomMethod = ({ nickname, roomName }) =>
     WithSignalRComponent.connection.invoke("joinRoom", nickname, roomName);
 
-  refreshRoom: RefreshRoomMethod = ({ roomName }) => { console.log("Refresh room", roomName); WithSignalRComponent.connection.invoke("refreshRoom", roomName); }
+  refreshRoom: RefreshRoomMethod = ({ roomName }) =>
+    WithSignalRComponent.connection.invoke("refreshRoom", roomName);
 
   render() {
-    return this.props.children({
-      messages: this.state.messages,
-      createRoom: this.createRoom,
-      joinRoom: this.joinRoom,
-      refreshRoom: this.refreshRoom,
-      members: this.state.members
-    });
+    return this.props.children
+      ? this.props.children({
+          createRoom: this.createRoom,
+          joinRoom: this.joinRoom,
+          refreshRoom: this.refreshRoom
+        })
+      : null;
   }
 }
 
-export const WithSignalR = withRouter(WithSignalRComponent)
+export const WithSignalR = withRouter<SignalRHOCProps & RouteComponentProps>(
+  WithSignalRComponent
+);
