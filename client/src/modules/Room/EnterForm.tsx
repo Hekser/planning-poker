@@ -5,7 +5,7 @@ import {
   EnterFormGroup,
   EnterFormLabel
 } from "./styled";
-import { Input } from "../Common/Input";
+import { Input } from "../Common/components/Input";
 
 export interface EnterFormProps {
   type: "create" | "join";

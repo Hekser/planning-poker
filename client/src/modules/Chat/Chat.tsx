@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as SignalR from '@aspnet/signalr';
 
-import { Button } from "../Common/Button";
+import { Button } from "../Common/components/Button";
 
 interface ChattProps { }
 interface ChatState {

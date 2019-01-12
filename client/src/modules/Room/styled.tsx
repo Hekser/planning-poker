@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { Button } from "../Common/Button";
+import { Button } from "../Common/components/Button";
 import { PaneStyles } from "../Common/styles";
 
 export const Wrapper = styled.div`

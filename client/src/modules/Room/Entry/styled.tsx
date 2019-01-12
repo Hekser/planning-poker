@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 
 import { PaneStyles } from "../../Common/styles";
-import { Button } from "../../Common/Button";
+import { Button } from "../../Common/components/Button";
 
 export const UsersList = styled.div`
   font-size: 1.2em;

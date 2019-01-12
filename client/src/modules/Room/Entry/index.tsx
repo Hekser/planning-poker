@@ -4,7 +4,7 @@ import { withRouter, RouteComponentProps } from "react-router";
 import { User } from "./interfaces";
 import { GetReady } from "./GetReady";
 import { DuringPlanning } from "./DuringPlanning";
-import { WithSignalR, MemberRole } from "../../HOC/SignalR";
+import { WithSignalR, MemberRole } from "../../Common/HOC/SignalR";
 
 export interface RoomEntryState {
   roomStatus: "beforeStart" | "duringPlanning" | "planningFinished";

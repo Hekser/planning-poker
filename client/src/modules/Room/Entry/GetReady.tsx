@@ -1,6 +1,5 @@
 import React from "react";
 
-import { ParticipantList } from "./ParticipantList";
 import { User } from "./interfaces";
 import {
   GetReadyStartButton,
@@ -9,7 +8,6 @@ import {
   UserRow,
   UserRowName
 } from "./styled";
-import { WithSignalR, MemberRole } from "../../HOC/SignalR";
 
 export interface GetReadyProps {
   users: User[];
