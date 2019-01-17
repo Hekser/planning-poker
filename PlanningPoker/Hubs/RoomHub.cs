@@ -80,6 +80,63 @@ namespace PlanningPoker.Hubs
       });
     }
 
+    public async System.Threading.Tasks.Task ChangeTaskStatus(int id, Models.TaskStatus taskStatus)
+    {
+      await Execute(async () =>
+      {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        var task = storage.ChangeStatus(Context.ConnectionId, room, id, taskStatus);
+        await Clients.Group(room.RoomName).SendAsync("TaskChanged", task);
+      });
+    }
+
+    public async System.Threading.Tasks.Task StartEstimating()
+    {
+      await Execute(async () =>
+      {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        storage.StartEstimating(Context.ConnectionId, room);
+        await Clients.Group(room.RoomName).SendAsync("EstimatingStarted");
+      });
+    }
+
+    public async System.Threading.Tasks.Task ProposeEstimationTime(int estimatedTime)
+    {
+      await Execute(async () =>
+      {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        var response = storage.ProposeEstimationTime(Context.ConnectionId, room, estimatedTime);
+
+        if (response.Item1)
+        {
+          await Clients.Group(room.RoomName).SendAsync("EstimationFinished", response.Item2);
+        }
+        else
+        {
+          await Clients.Group(room.RoomName).SendAsync("EstimationTimeProposed", Context.ConnectionId);
+        }
+      });
+    }
+
+    public async System.Threading.Tasks.Task ConfirmEstimationTime(int estimatedTime)
+    {
+      await Execute(async () =>
+      {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        var task = storage.ConfirmEstimationTime(Context.ConnectionId, room, estimatedTime);
+        await Clients.Group(room.RoomName).SendAsync("TaskChanged", task);
+      });
+    }
+
+    public async System.Threading.Tasks.Task FinishPlanning()
+    {
+      await Execute(async () => {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        storage.FinishPlanning(Context.ConnectionId, room);
+        await Clients.Group(room.RoomName).SendAsync("PlanningFinished");
+      });
+    }
+
     public async System.Threading.Tasks.Task LeaveRoom(string roomName)
     {
       await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);

@@ -71,6 +71,59 @@ namespace PlanningPoker.Logic.Services
 			return task;
         }
 
+		public Task ChangeStatus(string connectionId, Room room, int taskId, TaskStatus taskStatus)
+		{
+			CheckAdminPermission(connectionId, room);
+			var task = room.Tasks.FirstOrDefault(x => x.Id == taskId);
+			if (task == null) { validator.Throw("Task nie istnieje!"); }
+			if (taskStatus == TaskStatus.DuringEstimation && room.Tasks.Any(x => x.Status == TaskStatus.DuringEstimation))
+			{
+				foreach (var item in room.Tasks)
+				{
+					if (item.Status == TaskStatus.DuringEstimation)
+					{
+						item.Status = TaskStatus.NotEstimated;
+					}
+				}
+
+				room.ProposeEstimations = new List<ProposeEstimationTime>();
+			}
+			task.Status = taskStatus;
+			return task;
+		}
+
+		public void StartEstimating(string connectionId, Room room)
+		{
+			CheckAdminPermission(connectionId, room);
+			room.ProposeEstimations = new List<ProposeEstimationTime>();
+		}
+
+		public Tuple<bool, IList<ProposeEstimationTime>> ProposeEstimationTime(string connectionId, Room room, int estimatedTime)
+		{
+			room.ProposeEstimations.Add(new Models.ProposeEstimationTime
+			{
+				ConnectionId = connectionId,
+				EstimationTimePropose = estimatedTime
+			});
+			return Tuple.Create<bool, IList<ProposeEstimationTime>>(
+				room.ProposeEstimations.Count == room.Members.Count, room.ProposeEstimations
+			);
+		}
+
+		public Task ConfirmEstimationTime(string connectionId, Room room, int estimatedTime)
+		{
+			CheckAdminPermission(connectionId, room);
+			var task = room.Tasks.FirstOrDefault(x => x.Status == TaskStatus.DuringEstimation);
+			task.EstimatedTime = estimatedTime;
+			task.Status = TaskStatus.Estimated;
+			return task;
+		}
+
+		public void FinishPlanning(string connectionId, Room room)
+		{
+			CheckAdminPermission(connectionId, room);
+		}
+
 		public string RemoveMember(string connectionId)
 		{
 			var room = Rooms.FirstOrDefault(r => r.Members.Select(x => x.ConnectionId).Contains(connectionId));

@@ -12,5 +12,7 @@ namespace PlanningPoker.Models
         public IList<Member> Members { get; set; }
 
         public IList<Task> Tasks { get; set; }
+
+        public IList<ProposeEstimationTime> ProposeEstimations { get; set; }
     }
 }
