@@ -2,7 +2,7 @@ import React from "react";
 
 import { Title, StartButtonsWrapper, CreateButton, JoinButton } from "./styled";
 import { withRouter } from "react-router";
-import { CREATE_ROOM_PATH, JOIN_ROOM_PATH } from "../paths";
+import { CREATE_ROOM_PATH, JOIN_ROOM_PATH } from "../../config/paths";
 
 export const Start = withRouter(({ history }) => (
   <div>

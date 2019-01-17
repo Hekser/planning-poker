@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/PlanningPoker/bin/Debug/netcoreapp2.1/PlanningPoker.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.1/PlanningPoker.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/PlanningPoker",
+            "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import { InputStyles } from "./styles";
+import { InputStyles } from "../styles";
 
 const StyledInput = styled.input`
   ${InputStyles};

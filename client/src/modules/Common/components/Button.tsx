@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from "react";
 import styled from "styled-components";
 
-import { InputStyles } from "./styles";
+import { InputStyles } from "../styles";
 
 const StyledButton = styled.button`
   ${InputStyles};

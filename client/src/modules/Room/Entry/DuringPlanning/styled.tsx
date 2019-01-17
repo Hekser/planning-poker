@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { Pane } from "../../../Common/Pane";
+import { Pane } from "../../../Common/components/Pane";
 
 export const Wrapper = styled.div`
   display: flex;

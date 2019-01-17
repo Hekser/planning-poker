@@ -1,7 +1,10 @@
 import React, { Component, ReactNode } from "react";
 import * as SignalR from "@aspnet/signalr";
 import { withRouter, RouteComponentProps } from "react-router";
-import { ROOM_PATH } from "../../paths";
+import { connect } from "react-redux";
+
+import { ROOM_PATH } from "../../../../config/paths";
+import { RootState } from "../../../../config/rematch";
 
 const HUB_URL = "http://localhost:7000/roomHub";
 
@@ -40,7 +43,7 @@ class WithSignalRComponent extends Component<
 > {
   static connection: SignalR.HubConnection;
 
-  constructor(props) {
+  constructor(props: SignalRHOCProps & RouteComponentProps) {
     super(props);
 
     const { history, onRoomRefreshed } = this.props;
@@ -91,6 +94,8 @@ class WithSignalRComponent extends Component<
   }
 }
 
+const mapState = (state: RootState) => ({ members: state.room.members });
+
 export const WithSignalR = withRouter<SignalRHOCProps & RouteComponentProps>(
-  WithSignalRComponent
+  connect(mapState)(WithSignalRComponent)
 );
