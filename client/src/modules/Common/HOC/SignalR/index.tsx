@@ -4,17 +4,16 @@ import { withRouter, RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
 
 import { ROOM_PATH } from "../../../../config/paths";
-import { RootState } from "../../../../config/rematch";
+import { RootState, Dispatch } from "../../../../config/rematch";
 
 const HUB_URL = "http://localhost:7000/roomHub";
 
 type CreateRoomMethod = (nickname: string, roomName: string) => void;
 type JoinRoomMethod = (values: { nickname: string; roomName: string }) => void;
 type RefreshRoomMethod = (values: { roomName: string }) => void;
-type OnRoomRefreshedMethod = (values: { members: Member[] }) => void;
 
 export interface Member {
-  MemberId: string;
+  ConnectionId: string;
   Nick: string;
   Role: MemberRole;
 }
@@ -31,27 +30,31 @@ interface SignalRHOCMethods {
 }
 
 export interface SignalRHOCProps {
-  onRoomRefreshed?: OnRoomRefreshedMethod;
   children?: (props: SignalRHOCMethods) => ReactNode;
+  changeMembers?: (member: Member[]) => void;
 }
 
-interface SignalRHOCState {}
+interface SignalRHOCState { }
 
 class WithSignalRComponent extends Component<
   SignalRHOCProps & RouteComponentProps,
   SignalRHOCState
-> {
+  > {
   static connection: SignalR.HubConnection;
 
   constructor(props: SignalRHOCProps & RouteComponentProps) {
     super(props);
 
-    const { history, onRoomRefreshed } = this.props;
+    const { history, changeMembers } = this.props;
 
     if (!WithSignalRComponent.connection) {
       WithSignalRComponent.connection = new SignalR.HubConnectionBuilder()
         .withUrl(HUB_URL)
         .build();
+
+      WithSignalRComponent.connection.on("onConnected", (connectionId: string) => {
+        console.log("onConnected", connectionId)
+      });
 
       WithSignalRComponent.connection.on("createRoom", res => {
         history.push(`${ROOM_PATH}/${res}`);
@@ -63,14 +66,12 @@ class WithSignalRComponent extends Component<
         this.refreshRoom({ roomName: res });
       });
 
-      WithSignalRComponent.connection.start();
-    }
-
-    if (onRoomRefreshed) {
       WithSignalRComponent.connection.on("refreshRoom", membersStringify => {
-        const members = JSON.parse(membersStringify);
-        onRoomRefreshed({ members });
+        const members = JSON.parse(membersStringify)
+        changeMembers(members)
       });
+
+      WithSignalRComponent.connection.start();
     }
   }
 
@@ -86,16 +87,18 @@ class WithSignalRComponent extends Component<
   render() {
     return this.props.children
       ? this.props.children({
-          createRoom: this.createRoom,
-          joinRoom: this.joinRoom,
-          refreshRoom: this.refreshRoom
-        })
+        createRoom: this.createRoom,
+        joinRoom: this.joinRoom,
+        refreshRoom: this.refreshRoom
+      })
       : null;
   }
 }
 
 const mapState = (state: RootState) => ({ members: state.room.members });
 
+const mapDispatch = (dispatch: Dispatch) => ({ changeMembers: dispatch.room.changeMembers })
+
 export const WithSignalR = withRouter<SignalRHOCProps & RouteComponentProps>(
-  connect(mapState)(WithSignalRComponent)
+  connect(mapState, mapDispatch)(WithSignalRComponent)
 );

@@ -1,15 +1,22 @@
-import { Model } from "@rematch/core";
+import { Model, createModel } from "@rematch/core";
+
+import { Member } from "../Common/HOC/SignalR";
 
 export interface RoomModelState {
-  members: string[];
+  members: Member[];
 }
 
 const initState: RoomModelState = {
-  members: ["Janek", "Dzbanek"]
+  members: []
 };
 
-export const RoomModel: Model<RoomModelState> = {
+export const RoomModel = createModel({
   name: "room",
   state: initState,
-  reducers: {}
-};
+  reducers: {
+    changeMembers(state, members: Member[]) {
+      state.members = members
+      return state
+    }
+  }
+})

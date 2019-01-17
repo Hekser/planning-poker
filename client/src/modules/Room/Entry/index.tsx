@@ -4,7 +4,6 @@ import { withRouter, RouteComponentProps } from "react-router";
 import { User } from "./interfaces";
 import { GetReady } from "./GetReady";
 import { DuringPlanning } from "./DuringPlanning";
-import { WithSignalR, MemberRole } from "../../Common/HOC/SignalR";
 
 export interface RoomEntryState {
   roomStatus: "beforeStart" | "duringPlanning" | "planningFinished";
@@ -12,7 +11,7 @@ export interface RoomEntryState {
 }
 
 export interface RoomEntryProps
-  extends RouteComponentProps<{ roomId: string }> {}
+  extends RouteComponentProps<{ roomId: string }> { }
 
 class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
   state: RoomEntryState = {
@@ -42,22 +41,7 @@ class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
   render() {
     switch (this.state.roomStatus) {
       case "beforeStart":
-        return (
-          <>
-            <WithSignalR
-              onRoomRefreshed={({ members }) => {
-                console.log(members);
-                this.setState({
-                  users: members.map(m => ({
-                    name: m.Nick,
-                    isAdmin: m.Role === MemberRole.Admin
-                  }))
-                });
-              }}
-            />
-            <GetReady users={this.state.users} onStart={this.onStart} />
-          </>
-        );
+        return <GetReady users={this.state.users} onStart={this.onStart} />
       case "duringPlanning":
         return <DuringPlanning />;
     }
