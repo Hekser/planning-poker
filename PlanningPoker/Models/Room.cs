@@ -10,5 +10,7 @@ namespace PlanningPoker.Models
         public string RoomName { get; set; }
 
         public IList<Member> Members { get; set; }
+
+        public IList<Task> Tasks { get; set; }
     }
 }

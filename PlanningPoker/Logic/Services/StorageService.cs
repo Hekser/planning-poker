@@ -23,7 +23,7 @@ namespace PlanningPoker.Logic.Services
 
 		public void CreateRoom(string roomName, Member member)
 		{
-			validator.CheckAdminPermission(member.Role);
+			validator.CheckAdminPermission(member);
 			validator.CheckRoomName(Rooms, roomName);
 
 			Rooms.Add(
@@ -50,26 +50,52 @@ namespace PlanningPoker.Logic.Services
 			return Rooms.First(x => x.RoomName == roomName).Members;
 		}
 
-		public void RemoveMember(string connectionId)
+		public void StartPlanning(string connectionId, Room room)
 		{
-			var roomsIdsToRemove = new List<int>();
-			
-			foreach (var room in Rooms)
-			{
-				room.Members = room.Members.Where(x => x.MemberId != connectionId).ToList();
+			CheckAdminPermission(connectionId, room);
+		}
 
-				if (room.Members.Count == 0)
-				{
-					roomsIdsToRemove.Add(room.RoomId);
-				}
+        public Task AddTask(string connectionId, Room room, string name)
+        {
+			CheckAdminPermission(connectionId, room);
+			var task = new Task
+			{
+				Id = room.Tasks.Count,
+				Title = name,
+				EstimatedTime = null,
+				Status = TaskStatus.NotEstimated
+			};
+
+			room.Tasks.Add(task);
+			
+			return task;
+        }
+
+		public string RemoveMember(string connectionId)
+		{
+			var room = Rooms.FirstOrDefault(r => r.Members.Select(x => x.ConnectionId).Contains(connectionId));
+
+			room.Members = room.Members.Where(x => x.ConnectionId != connectionId).ToList();
+
+			if (room.Members.Count == 0)
+			{
+				Rooms = Rooms.Where(x => x.RoomId != room.RoomId).ToList();
 			}
 
-			RemoveRooms(roomsIdsToRemove);
+			return room.RoomName;
 		}
 
-		private void RemoveRooms(IEnumerable<int> roomsIds)
+		public Room GetMembersRoom(string connectionId)
 		{
-			Rooms = Rooms.Where(x => !roomsIds.Contains(x.RoomId)).ToList();
+			var room = Rooms.FirstOrDefault(x => x.Members.Select(member => member.ConnectionId).Contains(connectionId));
+			if (room == null) { validator.Throw("Użytkownik nie dołączył do żadnego pokoju!"); }
+			return room;
 		}
-	}
+
+		private void CheckAdminPermission(string connectionId, Room room)
+		{
+			var member = room.Members.FirstOrDefault(x => x.ConnectionId == connectionId);
+			validator.CheckAdminPermission(member);
+		}
+    }
 }

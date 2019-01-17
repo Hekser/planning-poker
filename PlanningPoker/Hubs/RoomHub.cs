@@ -13,46 +13,46 @@ namespace PlanningPoker.Hubs
   {
     private StorageService storage = StorageService.Instance;
 
-    public override async Task OnConnectedAsync()
+    public override async System.Threading.Tasks.Task OnConnectedAsync()
     {
-      await Clients.All.SendAsync("ReceiveMessage", "Connected");
+      await Clients.All.SendAsync("OnConnected", Context.ConnectionId);
       await base.OnConnectedAsync();
     }
 
-    public override async Task OnDisconnectedAsync(Exception exception)
+    public override async System.Threading.Tasks.Task OnDisconnectedAsync(Exception exception)
     {
-      // await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
-      storage.RemoveMember(Context.ConnectionId);
-      // this.RefreshRoom();
+      var roomName = storage.RemoveMember(Context.ConnectionId);
+      await this.RefreshRoom(roomName);
+      await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);
       await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendMessage(string user, string message)
+    public async System.Threading.Tasks.Task SendMessage(string user, string message)
     {
       await Clients.All.SendAsync("ReceiveMessage", user, message);
     }
 
-    public async Task CreateRoom(string nickName, string roomName)
+    public async System.Threading.Tasks.Task CreateRoom(string nickName, string roomName)
     {
       await Execute(async () =>
       {
-        storage.CreateRoom(roomName, new Member() { Nick = nickName, Role = Role.Admin, MemberId = Context.ConnectionId });
+        storage.CreateRoom(roomName, new Member() { Nick = nickName, Role = Role.Admin, ConnectionId = Context.ConnectionId });
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
         await Clients.Caller.SendAsync("CreateRoom", roomName);
       });
     }
 
-    public async Task JoinRoom(string nickName, string roomName)
+    public async System.Threading.Tasks.Task JoinRoom(string nickName, string roomName)
     {
       await Execute(async () =>
       {
-        storage.AddMember(roomName, new Member() { Nick = nickName, Role = Role.Member, MemberId = Context.ConnectionId });
+        storage.AddMember(roomName, new Member() { Nick = nickName, Role = Role.Member, ConnectionId = Context.ConnectionId });
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
         await Clients.Caller.SendAsync("JoinRoom", roomName);
       });
     }
 
-    public async Task RefreshRoom(string roomName)
+    public async System.Threading.Tasks.Task RefreshRoom(string roomName)
     {
       await Execute(async () =>
       {
@@ -60,24 +60,44 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async Task LeaveRoom(string roomName)
+    public async System.Threading.Tasks.Task StartPlanning()
+    {
+      await Execute(async () =>
+      {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        storage.StartPlanning(Context.ConnectionId, room);
+        await Clients.Group(room.RoomName).SendAsync("PlanningStarted");
+      });
+    }
+
+    public async System.Threading.Tasks.Task AddTask(string name)
+    {
+      await Execute(async () =>
+      {
+        var room = storage.GetMembersRoom(Context.ConnectionId);
+        var task = storage.AddTask(Context.ConnectionId, room, name);
+        await Clients.Group(room.RoomName).SendAsync("TaskAdded", task);
+      });
+    }
+
+    public async System.Threading.Tasks.Task LeaveRoom(string roomName)
     {
       await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);
     }
 
-    private Task Execute(Action action)
+    private System.Threading.Tasks.Task Execute(Action action)
     {
       try
       {
-        return Task.Run(() => action());
+        return System.Threading.Tasks.Task.Run(() => action());
       }
       catch (HubException ex)
       {
-        return Clients.Caller.SendAsync("HandleError", ex.Message);
+        return Clients.Caller.SendAsync("ErrorOccured", ex.Message);
       }
       catch (Exception)
       {
-        return Clients.Caller.SendAsync("HandleError", "Ups! Coś poszło nie tak!");
+        return Clients.Caller.SendAsync("ErrorOccured", "Ups! Coś poszło nie tak!");
       }
     }
   }

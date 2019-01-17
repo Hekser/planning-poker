@@ -7,9 +7,10 @@ namespace PlanningPoker.Logic.Services
 {
     public class StorageValidator
     {
-        public void CheckAdminPermission(Role role)
+        public void CheckAdminPermission(Member member)
         {
-            if (role != Role.Admin) { throw new HubException("Nie posiadasz wymaganych uprawnień!"); }
+            if (member == null) { throw new HubException("Użytkownik nie istnieje!"); }
+            if (member.Role != Role.Admin) { throw new HubException("Nie posiadasz wymaganych uprawnień!"); }
         }
 
         public void CheckRoomName(IEnumerable<Room> rooms, string roomName)
@@ -26,6 +27,11 @@ namespace PlanningPoker.Logic.Services
             {
                 throw new HubException("Pokój o takiej nazwie nie istnieje!");
             }
+        }
+
+        public void Throw(string message)
+        {
+            throw new HubException(message);
         }
     }
 }
