@@ -3,19 +3,22 @@ import React, { Component } from "react";
 import {
   Wrapper,
   MainWindow,
-  MembersList,
   TasksList,
-  CardsPanel
+  CardsPanel,
+  MembersListWrapper
 } from "./styled";
+import MembersList from "../MembersList";
 
 export class DuringPlanning extends Component {
   render() {
     return (
       <Wrapper>
         <MainWindow>_MAIN_WINDOW_</MainWindow>
-        <TasksList>_TASKS_</TasksList>
+        <TasksList />
         <CardsPanel>_CARDS_</CardsPanel>
-        <MembersList />
+        <MembersListWrapper>
+          <MembersList />
+        </MembersListWrapper>
       </Wrapper>
     );
   }

@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
-import MembersListComponent from "../MembersList";
+import Tasks from "./Tasks";
+import { PaneStyles } from "../../../Common/styles";
 
 export const Wrapper = styled.div`
   display: grid;
@@ -18,17 +19,17 @@ export const MainWindow = styled.div`
   border: 1px dotted green;
 `;
 
-export const TasksList = styled.div`
+export const TasksList = styled(Tasks)`
   grid-column: 2;
   grid-row: 1;
   border: 1px dotted orange;
 `;
 
-export const MembersList = styled(MembersListComponent)`
+export const MembersListWrapper = styled.div`
+  ${PaneStyles};
   grid-column: 2;
   grid-row-start: 2;
   grid-row-end: 4;
-  border: 1px dotted blue;
 `;
 
 export const CardsPanel = styled.div`
