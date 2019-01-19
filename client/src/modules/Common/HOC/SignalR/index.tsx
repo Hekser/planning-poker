@@ -15,6 +15,8 @@ type RefreshRoomMethod = (values: { roomName: string }) => void;
 type EmptyFunction = () => void;
 type AddTaskMethod = (title: string) => void;
 type ChangeTaskStatusMethod = (id: number, status: TaskStatus) => void;
+type ProposeEstimationTimeMethod = (estimationTime: number) => void;
+type ConfirmEstimationTimeMethod = (estimationTime: number) => void;
 
 export interface Member {
   ConnectionId: string;
@@ -34,6 +36,10 @@ interface SignalRHOCMethods {
   startPlanning: EmptyFunction;
   addTask: AddTaskMethod;
   changeTaskStatus: ChangeTaskStatusMethod;
+  startEstimating: EmptyFunction;
+  proposeEstimationTime: ProposeEstimationTimeMethod;
+  confirmEstimationTime: ConfirmEstimationTimeMethod;
+  finishPlanning: EmptyFunction;
 }
 
 interface SignalRDispatchProps {
@@ -107,7 +113,7 @@ class WithSignalRComponent extends Component<
         "taskAdded",
         (taskStringify: string) => {
           const task: Task = JSON.parse(taskStringify);
-          console.log(taskStringify, task);
+          console.log("taskAdded", taskStringify, task);
           addTask(task);
         }
       );
@@ -116,10 +122,36 @@ class WithSignalRComponent extends Component<
         "taskChanged",
         (taskStringify: string) => {
           const task: Task = JSON.parse(taskStringify);
-          console.log(taskStringify, task);
+          console.log("taskChanged", taskStringify, task);
           changeTask(task);
         }
       );
+
+      WithSignalRComponent.connection.on("estimatingStarted", () => {
+        // TODO: set room to estimating status
+        console.log("estimatingStarted");
+      });
+
+      WithSignalRComponent.connection.on(
+        "estimationTimeProposed",
+        (connectionId: string) => {
+          // TODO: check that user with connectionId proposed estimation time
+          console.log("estimationTimeProposed", connectionId);
+        }
+      );
+
+      WithSignalRComponent.connection.on(
+        "estimationFinished",
+        (proposedEstimationTimeStringify: string) => {
+          // TODO: unset room estimating status and display proposed time
+          console.log("estimationFinished", proposedEstimationTimeStringify);
+        }
+      );
+
+      WithSignalRComponent.connection.on("planningFinished", () => {
+        // TODO: set room status to finished
+        console.log("planningFinished");
+      });
 
       WithSignalRComponent.connection.start();
     }
@@ -143,6 +175,21 @@ class WithSignalRComponent extends Component<
   changeTaskStatus: ChangeTaskStatusMethod = (id, status) =>
     WithSignalRComponent.connection.invoke("changeTaskStatus", id, status);
 
+  startEstimating: EmptyFunction = () =>
+    WithSignalRComponent.connection.invoke("startEstimating");
+
+  proposeEstimationTime: ProposeEstimationTimeMethod = proposeTime =>
+    WithSignalRComponent.connection.invoke("proposeEstimationTime");
+
+  confirmEstimationTime: ConfirmEstimationTimeMethod = estimationTime =>
+    WithSignalRComponent.connection.invoke(
+      "confirmEstimationTime",
+      estimationTime
+    );
+
+  finishPlanning: EmptyFunction = () =>
+    WithSignalRComponent.connection.invoke("finishPlanning");
+
   render() {
     return this.props.children
       ? this.props.children({
@@ -151,7 +198,11 @@ class WithSignalRComponent extends Component<
           refreshRoom: this.refreshRoom,
           startPlanning: this.startPlanning,
           addTask: this.addTask,
-          changeTaskStatus: this.changeTaskStatus
+          changeTaskStatus: this.changeTaskStatus,
+          startEstimating: this.startEstimating,
+          proposeEstimationTime: this.proposeEstimationTime,
+          confirmEstimationTime: this.confirmEstimationTime,
+          finishPlanning: this.finishPlanning
         })
       : null;
   }

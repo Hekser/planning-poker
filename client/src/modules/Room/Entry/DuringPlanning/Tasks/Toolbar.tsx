@@ -20,6 +20,7 @@ class Toolbar extends Component<{}, State> {
     <Wrapper>
       <Textarea
         onChange={({ target: { value } }) => this.changeTextarea(value)}
+        value={this.state.textarea}
       />
       <WithSignalR>
         {({ addTask }) => (
