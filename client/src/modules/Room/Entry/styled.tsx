@@ -43,3 +43,5 @@ export const GetReadyDescription = styled.p`
   color: #cccccc;
   text-align: justify;
 `;
+
+export const MembersListWrapper = styled.div``;

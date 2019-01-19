@@ -1,51 +1,30 @@
 import React, { Component } from "react";
 import { withRouter, RouteComponentProps } from "react-router";
 
-import { User } from "./interfaces";
 import { GetReady } from "./GetReady";
 import { DuringPlanning } from "./DuringPlanning";
+import { RoomStatus } from "../model";
+import { connect } from "react-redux";
+import { RootState } from "../../../config/rematch";
 
-export interface RoomEntryState {
-  roomStatus: "beforeStart" | "duringPlanning" | "planningFinished";
-  users: User[];
-}
+export interface RoomEntryState {}
 
 export interface RoomEntryProps
-  extends RouteComponentProps<{ roomId: string }> { }
+  extends RouteComponentProps<{ roomId: string }> {
+  status: RoomStatus;
+}
 
 class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
-  state: RoomEntryState = {
-    roomStatus: "beforeStart",
-    users: []
-  };
-  componentDidMount() {
-    const {
-      match: {
-        params: { roomId }
-      }
-    } = this.props;
-    // TODO: connect with room by id
-    // MOCK
-    const users = [];
-    this.setState({
-      users
-    });
-  }
-
-  onStart = () => {
-    console.log("<Start planning button clicked>");
-    // TODO: Send to api start planning action
-    this.setState({ roomStatus: "duringPlanning" });
-  };
-
   render() {
-    switch (this.state.roomStatus) {
+    switch (this.props.status) {
       case "beforeStart":
-        return <GetReady onStart={this.onStart} />
+        return <GetReady />;
       case "duringPlanning":
         return <DuringPlanning />;
     }
   }
 }
 
-export const RoomEntry = withRouter(RoomEntryComponent);
+const mapState = (state: RootState) => ({ status: state.room.status });
+
+export const RoomEntry = withRouter(connect(mapState)(RoomEntryComponent));

@@ -5,17 +5,17 @@ import {
   GetReadyStartButton,
   GetReadyHeader,
   GetReadyWrapper,
-  UserRow,
-  UserRowName,
   GetReadyDescription
 } from "./styled";
 import { Member, MemberRole } from "../../Common/HOC/SignalR";
-import { RootState } from "../../../config/rematch";
+import { RootState, Dispatch } from "../../../config/rematch";
+import MembersList from "./MembersList";
+import { RoomStatus } from "../model";
 
 export interface GetReadyProps {
   connectionId: string;
   members: Member[];
-  onStart?: () => void;
+  changeStatus: (newStatus: RoomStatus) => void;
 }
 
 const mapState = (state: RootState) => ({
@@ -23,34 +23,30 @@ const mapState = (state: RootState) => ({
   connectionId: state.user.ConnectionId
 });
 
-export const GetReady = connect(mapState)(
-  ({ connectionId, members, onStart }: GetReadyProps) => {
-    const admin = members.find(m => m.Role === MemberRole.Admin);
-    const amIAdmin = admin && admin.ConnectionId === connectionId;
-    return (
-      <GetReadyWrapper>
-        <GetReadyHeader>Lista uczestników:</GetReadyHeader>
-        {members.map(m => (
-          <UserRow>
-            <UserRowName
-              isAdmin={m.Role === MemberRole.Admin}
-              isMe={m.ConnectionId === connectionId}
-            >
-              {m.Nick}
-            </UserRowName>
-          </UserRow>
-        ))}
-        {amIAdmin ? (
-          <GetReadyStartButton onClick={onStart}>
-            Rozpocznij planowanie
-          </GetReadyStartButton>
-        ) : (
-          <GetReadyDescription>
-            Poczekaj aż zbiorą się wszyscy uczestnicy i administrator rozpocznie
-            planowanie
-          </GetReadyDescription>
-        )}
-      </GetReadyWrapper>
-    );
-  }
-);
+const mapProps = (dispatch: Dispatch) => ({
+  changeStatus: dispatch.room.changeStatus as unknown
+});
+
+export const GetReady = connect(
+  mapState,
+  mapProps
+)(({ connectionId, members, changeStatus }: GetReadyProps) => {
+  const admin = members.find(m => m.Role === MemberRole.Admin);
+  const amIAdmin = admin && admin.ConnectionId === connectionId;
+  return (
+    <GetReadyWrapper>
+      <GetReadyHeader>Lista uczestników:</GetReadyHeader>
+      <MembersList />
+      {amIAdmin ? (
+        <GetReadyStartButton onClick={() => changeStatus("duringPlanning")}>
+          Rozpocznij planowanie
+        </GetReadyStartButton>
+      ) : (
+        <GetReadyDescription>
+          Poczekaj aż zbiorą się wszyscy uczestnicy i administrator rozpocznie
+          planowanie
+        </GetReadyDescription>
+      )}
+    </GetReadyWrapper>
+  );
+});

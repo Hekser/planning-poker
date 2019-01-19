@@ -4,7 +4,7 @@ import { Switch, Route, withRouter } from "react-router-dom";
 import {
   CREATE_ROOM_PATH,
   JOIN_ROOM_PATH,
-  ROOM_PATH
+  ENTRY_ROOM_PATH
 } from "../../config/paths";
 import { Wrapper } from "./styled";
 import { Create } from "./Create";
@@ -18,7 +18,7 @@ export const Room = withRouter(({ match }) => (
       <Route path={match.path} exact component={Start} />
       <Route path={`${CREATE_ROOM_PATH}`} component={Create} />
       <Route path={`${JOIN_ROOM_PATH}`} component={Join} />
-      <Route path={`${ROOM_PATH}/:roomId`} component={RoomEntry} />
+      <Route path={`${ENTRY_ROOM_PATH}`} component={RoomEntry} />
     </Switch>
   </Wrapper>
 ));

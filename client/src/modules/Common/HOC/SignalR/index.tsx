@@ -3,7 +3,7 @@ import * as SignalR from "@aspnet/signalr";
 import { withRouter, RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
 
-import { ROOM_PATH } from "../../../../config/paths";
+import { ROOM_PATH, ENTRY_ROOM_PATH } from "../../../../config/paths";
 import { RootState, Dispatch } from "../../../../config/rematch";
 
 const HUB_URL = "http://localhost:7000/roomHub";
@@ -63,12 +63,12 @@ class WithSignalRComponent extends Component<
       WithSignalRComponent.connection.onclose(() => changeConnectionId(null));
 
       WithSignalRComponent.connection.on("createRoom", res => {
-        history.push(`${ROOM_PATH}/${res}`);
+        history.push(ENTRY_ROOM_PATH);
         this.refreshRoom({ roomName: res });
       });
 
       WithSignalRComponent.connection.on("joinRoom", res => {
-        history.push(`${ROOM_PATH}/${res}`);
+        history.push(ENTRY_ROOM_PATH);
         this.refreshRoom({ roomName: res });
       });
 
