@@ -10,7 +10,7 @@ export interface RoomModelState {
 }
 
 const initState: RoomModelState = {
-  status: "duringPlanning",
+  status: "beforeStart",
   members: []
 };
 

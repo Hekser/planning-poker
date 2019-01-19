@@ -5,12 +5,14 @@ import { connect } from "react-redux";
 
 import { ROOM_PATH, ENTRY_ROOM_PATH } from "../../../../config/paths";
 import { RootState, Dispatch } from "../../../../config/rematch";
+import { RoomStatus } from "../../../Room/model";
 
 const HUB_URL = "http://localhost:7000/roomHub";
 
 type CreateRoomMethod = (nickname: string, roomName: string) => void;
 type JoinRoomMethod = (values: { nickname: string; roomName: string }) => void;
 type RefreshRoomMethod = (values: { roomName: string }) => void;
+type EmptyFunction = () => void;
 
 export interface Member {
   ConnectionId: string;
@@ -27,26 +29,38 @@ interface SignalRHOCMethods {
   createRoom: CreateRoomMethod;
   joinRoom: JoinRoomMethod;
   refreshRoom: RefreshRoomMethod;
+  startPlanning: EmptyFunction;
+}
+
+interface SignalRDispatchProps {
+  changeMembers: (member: Member[]) => void;
+  changeConnectionId: (connectionId: string) => void;
+  changeStatus: (newStatus: RoomStatus) => void;
 }
 
 export interface SignalRHOCProps {
   children?: (props: SignalRHOCMethods) => ReactNode;
-  changeMembers?: (member: Member[]) => void;
-  changeConnectionId?: (connectionId: string) => void;
 }
 
 interface SignalRHOCState {}
 
 class WithSignalRComponent extends Component<
-  SignalRHOCProps & RouteComponentProps,
+  SignalRHOCProps & SignalRDispatchProps & RouteComponentProps,
   SignalRHOCState
 > {
   static connection: SignalR.HubConnection;
 
-  constructor(props: SignalRHOCProps & RouteComponentProps) {
+  constructor(
+    props: SignalRHOCProps & SignalRDispatchProps & RouteComponentProps
+  ) {
     super(props);
 
-    const { history, changeMembers, changeConnectionId } = this.props;
+    const {
+      history,
+      changeMembers,
+      changeConnectionId,
+      changeStatus
+    } = this.props;
 
     if (!WithSignalRComponent.connection) {
       WithSignalRComponent.connection = new SignalR.HubConnectionBuilder()
@@ -77,6 +91,10 @@ class WithSignalRComponent extends Component<
         changeMembers(members);
       });
 
+      WithSignalRComponent.connection.on("planningStarted", () => {
+        changeStatus("duringPlanning");
+      });
+
       WithSignalRComponent.connection.start();
     }
   }
@@ -90,12 +108,16 @@ class WithSignalRComponent extends Component<
   refreshRoom: RefreshRoomMethod = ({ roomName }) =>
     WithSignalRComponent.connection.invoke("refreshRoom", roomName);
 
+  startPlanning: EmptyFunction = () =>
+    WithSignalRComponent.connection.invoke("startPlanning");
+
   render() {
     return this.props.children
       ? this.props.children({
           createRoom: this.createRoom,
           joinRoom: this.joinRoom,
-          refreshRoom: this.refreshRoom
+          refreshRoom: this.refreshRoom,
+          startPlanning: this.startPlanning
         })
       : null;
   }
@@ -104,8 +126,9 @@ class WithSignalRComponent extends Component<
 const mapState = (state: RootState) => ({ members: state.room.members });
 
 const mapDispatch = (dispatch: Dispatch) => ({
-  changeMembers: dispatch.room.changeMembers,
-  changeConnectionId: dispatch.user.changeConnectionId
+  changeMembers: dispatch.room.changeMembers as unknown,
+  changeConnectionId: dispatch.user.changeConnectionId as unknown,
+  changeStatus: dispatch.room.changeStatus as unknown
 });
 
 export const WithSignalR = withRouter<SignalRHOCProps & RouteComponentProps>(

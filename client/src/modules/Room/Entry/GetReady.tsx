@@ -7,7 +7,7 @@ import {
   GetReadyWrapper,
   GetReadyDescription
 } from "./styled";
-import { Member, MemberRole } from "../../Common/HOC/SignalR";
+import { Member, MemberRole, WithSignalR } from "../../Common/HOC/SignalR";
 import { RootState, Dispatch } from "../../../config/rematch";
 import MembersList from "./MembersList";
 import { RoomStatus } from "../model";
@@ -38,9 +38,13 @@ export const GetReady = connect(
       <GetReadyHeader>Lista uczestników:</GetReadyHeader>
       <MembersList />
       {amIAdmin ? (
-        <GetReadyStartButton onClick={() => changeStatus("duringPlanning")}>
-          Rozpocznij planowanie
-        </GetReadyStartButton>
+        <WithSignalR>
+          {({ startPlanning }) => (
+            <GetReadyStartButton onClick={() => startPlanning()}>
+              Rozpocznij planowanie
+            </GetReadyStartButton>
+          )}
+        </WithSignalR>
       ) : (
         <GetReadyDescription>
           Poczekaj aż zbiorą się wszyscy uczestnicy i administrator rozpocznie
