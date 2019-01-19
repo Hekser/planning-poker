@@ -21,7 +21,7 @@ const MembersList: FunctionComponent<MembersListProps> = ({
 }) => (
   <MembersListWrapper>
     {members.map(m => (
-      <UserRow>
+      <UserRow key={m.ConnectionId}>
         <UserRowName
           isAdmin={m.Role === MemberRole.Admin}
           isMe={m.ConnectionId === connectionId}

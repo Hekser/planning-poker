@@ -4,11 +4,9 @@ import { PaneStyles } from "../../../../Common/styles";
 
 export const Wrapper = styled.div`
   ${PaneStyles};
-  display: flex;
-  flex-flow: column nowrap;
+  height: 100%;
 `;
 
 export const Content = styled.div`
-  flex: 1;
-  border: 1px dotted red;
+  height: calc(100% - 60px);
 `;

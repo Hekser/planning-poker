@@ -2,10 +2,13 @@ import React, { FunctionComponent } from "react";
 
 import { Wrapper, Content } from "./styled";
 import Toolbar from "./Toolbar";
+import List from "./List";
 
 const Tasks: FunctionComponent = () => (
   <Wrapper>
-    <Content>_CONTENT_</Content>
+    <Content>
+      <List />
+    </Content>
     <Toolbar />
   </Wrapper>
 );
