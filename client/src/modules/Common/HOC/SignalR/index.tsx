@@ -32,29 +32,35 @@ interface SignalRHOCMethods {
 export interface SignalRHOCProps {
   children?: (props: SignalRHOCMethods) => ReactNode;
   changeMembers?: (member: Member[]) => void;
+  changeConnectionId?: (connectionId: string) => void;
 }
 
-interface SignalRHOCState { }
+interface SignalRHOCState {}
 
 class WithSignalRComponent extends Component<
   SignalRHOCProps & RouteComponentProps,
   SignalRHOCState
-  > {
+> {
   static connection: SignalR.HubConnection;
 
   constructor(props: SignalRHOCProps & RouteComponentProps) {
     super(props);
 
-    const { history, changeMembers } = this.props;
+    const { history, changeMembers, changeConnectionId } = this.props;
 
     if (!WithSignalRComponent.connection) {
       WithSignalRComponent.connection = new SignalR.HubConnectionBuilder()
         .withUrl(HUB_URL)
         .build();
 
-      WithSignalRComponent.connection.on("onConnected", (connectionId: string) => {
-        console.log("onConnected", connectionId)
-      });
+      WithSignalRComponent.connection.on(
+        "onConnected",
+        (connectionId: string) => {
+          changeConnectionId(connectionId);
+        }
+      );
+
+      WithSignalRComponent.connection.onclose(() => changeConnectionId(null));
 
       WithSignalRComponent.connection.on("createRoom", res => {
         history.push(`${ROOM_PATH}/${res}`);
@@ -67,8 +73,8 @@ class WithSignalRComponent extends Component<
       });
 
       WithSignalRComponent.connection.on("refreshRoom", membersStringify => {
-        const members = JSON.parse(membersStringify)
-        changeMembers(members)
+        const members = JSON.parse(membersStringify);
+        changeMembers(members);
       });
 
       WithSignalRComponent.connection.start();
@@ -87,18 +93,24 @@ class WithSignalRComponent extends Component<
   render() {
     return this.props.children
       ? this.props.children({
-        createRoom: this.createRoom,
-        joinRoom: this.joinRoom,
-        refreshRoom: this.refreshRoom
-      })
+          createRoom: this.createRoom,
+          joinRoom: this.joinRoom,
+          refreshRoom: this.refreshRoom
+        })
       : null;
   }
 }
 
 const mapState = (state: RootState) => ({ members: state.room.members });
 
-const mapDispatch = (dispatch: Dispatch) => ({ changeMembers: dispatch.room.changeMembers })
+const mapDispatch = (dispatch: Dispatch) => ({
+  changeMembers: dispatch.room.changeMembers,
+  changeConnectionId: dispatch.user.changeConnectionId
+});
 
 export const WithSignalR = withRouter<SignalRHOCProps & RouteComponentProps>(
-  connect(mapState, mapDispatch)(WithSignalRComponent)
+  connect(
+    mapState,
+    mapDispatch
+  )(WithSignalRComponent)
 );

@@ -15,7 +15,7 @@ namespace PlanningPoker.Hubs
 
     public override async System.Threading.Tasks.Task OnConnectedAsync()
     {
-      await Clients.All.SendAsync("OnConnected", Context.ConnectionId);
+      await Clients.Caller.SendAsync("OnConnected", Context.ConnectionId);
       await base.OnConnectedAsync();
     }
 

@@ -12,12 +12,17 @@ export const UserRow = styled.div`
     background-color: #f5f5f5;
   }
 `;
-export const UserRowName = styled.span<{ isAdmin: boolean }>`
+export const UserRowName = styled.span<{ isAdmin: boolean; isMe: boolean }>`
   ${props =>
     props.isAdmin &&
     css`
       color: red;
       font-weight: bold;
+    `};
+  ${props =>
+    props.isMe &&
+    css`
+      text-decoration: underline;
     `}
 `;
 
@@ -31,4 +36,10 @@ export const GetReadyHeader = styled.h2`
 `;
 export const GetReadyStartButton = styled(Button)`
   margin-top: 20px;
+`;
+export const GetReadyDescription = styled.p`
+  margin-top: 10px;
+  font-style: italic;
+  color: #cccccc;
+  text-align: justify;
 `;

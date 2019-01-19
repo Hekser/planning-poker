@@ -41,7 +41,7 @@ class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
   render() {
     switch (this.state.roomStatus) {
       case "beforeStart":
-        return <GetReady users={this.state.users} onStart={this.onStart} />
+        return <GetReady onStart={this.onStart} />
       case "duringPlanning":
         return <DuringPlanning />;
     }

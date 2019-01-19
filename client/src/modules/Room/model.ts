@@ -1,4 +1,4 @@
-import { Model, createModel } from "@rematch/core";
+import { createModel } from "@rematch/core";
 
 import { Member } from "../Common/HOC/SignalR";
 
@@ -15,8 +15,7 @@ export const RoomModel = createModel({
   state: initState,
   reducers: {
     changeMembers(state, members: Member[]) {
-      state.members = members
-      return state
+      return { ...state, members };
     }
   }
-})
+});
