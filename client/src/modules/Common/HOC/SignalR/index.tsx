@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { ROOM_PATH, ENTRY_ROOM_PATH } from "../../../../config/paths";
 import { RootState, Dispatch } from "../../../../config/rematch";
 import { RoomStatus, Task, TaskStatus } from "../../../Room/model";
+import { Member } from "./interfaces";
 
 const HUB_URL = "http://localhost:7000/roomHub";
 
@@ -17,17 +18,6 @@ type AddTaskMethod = (title: string) => void;
 type ChangeTaskStatusMethod = (id: number, status: TaskStatus) => void;
 type ProposeEstimationTimeMethod = (estimationTime: number) => void;
 type ConfirmEstimationTimeMethod = (estimationTime: number) => void;
-
-export interface Member {
-  ConnectionId: string;
-  Nick: string;
-  Role: MemberRole;
-}
-
-export enum MemberRole {
-  "Admin" = 1,
-  "Member" = 2
-}
 
 interface SignalRHOCMethods {
   createRoom: CreateRoomMethod;
@@ -48,6 +38,7 @@ interface SignalRDispatchProps {
   changeStatus: (newStatus: RoomStatus) => void;
   addTask: (task: Task) => void;
   changeTask: (task: Task) => void;
+  setEstimating: (value: boolean) => void;
 }
 
 export interface SignalRHOCProps {
@@ -157,38 +148,55 @@ class WithSignalRComponent extends Component<
     }
   }
 
+  invoke = (methodName: string, ...args: any[]) => {
+    // WithSignalRComponent.connection &&
+    //   WithSignalRComponent.connection.invoke(methodName, ...args);
+  };
+
   createRoom: CreateRoomMethod = (nickname, roomName) =>
-    WithSignalRComponent.connection.invoke("createRoom", nickname, roomName);
+    this.invoke("createRoom", nickname, roomName);
 
   joinRoom: JoinRoomMethod = ({ nickname, roomName }) =>
-    WithSignalRComponent.connection.invoke("joinRoom", nickname, roomName);
+    this.invoke("joinRoom", nickname, roomName);
 
   refreshRoom: RefreshRoomMethod = ({ roomName }) =>
-    WithSignalRComponent.connection.invoke("refreshRoom", roomName);
+    this.invoke("refreshRoom", roomName);
 
-  startPlanning: EmptyFunction = () =>
-    WithSignalRComponent.connection.invoke("startPlanning");
+  startPlanning: EmptyFunction = () => this.invoke("startPlanning");
 
-  addTask: AddTaskMethod = title =>
-    WithSignalRComponent.connection.invoke("addTask", title);
+  addTask: AddTaskMethod = title => {
+    this.invoke("addTask", title);
 
-  changeTaskStatus: ChangeTaskStatusMethod = (id, status) =>
-    WithSignalRComponent.connection.invoke("changeTaskStatus", id, status);
+    // TEMP (only for tests)
+    this.props.addTask({
+      id: new Date().getTime(),
+      title,
+      status: TaskStatus.notEstimated
+    });
+  };
 
-  startEstimating: EmptyFunction = () =>
-    WithSignalRComponent.connection.invoke("startEstimating");
+  changeTaskStatus: ChangeTaskStatusMethod = (id, status) => {
+    this.invoke("changeTaskStatus", id, status);
+
+    // TEMP (only for tests)
+    console.log("changeTaskStatus");
+    this.props.changeTask({ id, status, title: "testnow" });
+  };
+
+  startEstimating: EmptyFunction = () => {
+    this.invoke("startEstimating");
+
+    // TEMP (only for tests)
+    this.props.setEstimating(true);
+  };
 
   proposeEstimationTime: ProposeEstimationTimeMethod = proposeTime =>
-    WithSignalRComponent.connection.invoke("proposeEstimationTime");
+    this.invoke("proposeEstimationTime");
 
   confirmEstimationTime: ConfirmEstimationTimeMethod = estimationTime =>
-    WithSignalRComponent.connection.invoke(
-      "confirmEstimationTime",
-      estimationTime
-    );
+    this.invoke("confirmEstimationTime", estimationTime);
 
-  finishPlanning: EmptyFunction = () =>
-    WithSignalRComponent.connection.invoke("finishPlanning");
+  finishPlanning: EmptyFunction = () => this.invoke("finishPlanning");
 
   render() {
     return this.props.children
@@ -215,7 +223,8 @@ const mapDispatch = (dispatch: Dispatch) => ({
   changeConnectionId: dispatch.user.changeConnectionId as unknown,
   changeStatus: dispatch.room.changeStatus as unknown,
   addTask: dispatch.room.addTask as unknown,
-  changeTask: dispatch.room.changeTask as unknown
+  changeTask: dispatch.room.changeTask as unknown,
+  setEstimating: dispatch.room.setEstimating as unknown
 });
 
 export const WithSignalR = withRouter<SignalRHOCProps & RouteComponentProps>(

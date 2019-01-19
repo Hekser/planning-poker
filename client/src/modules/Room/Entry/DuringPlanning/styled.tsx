@@ -15,7 +15,6 @@ export const MainWindow = styled.div`
   grid-column: 1;
   grid-row-start: 1;
   grid-row-end: 3;
-  border: 1px dotted green;
 `;
 
 export const TasksWrapper = styled.div`

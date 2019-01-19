@@ -9,12 +9,15 @@ import {
 } from "./styled";
 import MembersList from "../MembersList";
 import Tasks from "./Tasks";
+import Table from "./Table";
 
 export class DuringPlanning extends Component {
   render() {
     return (
       <Wrapper>
-        <MainWindow>_MAIN_WINDOW_</MainWindow>
+        <MainWindow>
+          <Table />
+        </MainWindow>
         <TasksWrapper>
           <Tasks />
         </TasksWrapper>

@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
 import { connect } from "react-redux";
 
-import { Member, MemberRole } from "../../Common/HOC/SignalR";
 import { UserRow, UserRowName, MembersListWrapper } from "./styled";
 import { RootState } from "../../../config/rematch";
+import { MemberRole, Member } from "../../Common/HOC/SignalR/interfaces";
 
 interface MembersListProps {
   members: Member[];
