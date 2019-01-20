@@ -1,14 +1,23 @@
 import styled from "styled-components";
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.button`
   width: 100px;
   height: 160px;
   background-color: #eeeeee;
   position: relative;
-  cursor: pointer;
-  transition: transform 0.2s;
-  &:hover {
-    transform: rotateX(30deg);
+  transition: border 0.2s;
+  border: 2px solid #aaaaaa;
+  border-radius: 4px;
+  font-weight: bold;
+  &:enabled {
+    &:hover {
+      cursor: pointer;
+      border: 2px solid lightblue;
+    }
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 `;
 
