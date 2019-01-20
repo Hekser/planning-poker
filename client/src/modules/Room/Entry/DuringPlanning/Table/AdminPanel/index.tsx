@@ -44,26 +44,26 @@ class AdminPanel extends Component<Props, State> {
       <Wrapper>
         <WithSignalR>
           {({ startEstimating, confirmEstimationTime }) =>
-            isEstimating ? (
-              isAllMembersProposedEstimationTime ? (
-                <ConfirmationWrapper>
-                  <StyledInput
-                    type="number"
-                    onChange={() => this.changeEstimationTime}
-                    value={this.state.estimatedTime}
-                  />
-                  <StyledButton
-                    onClick={() =>
-                      confirmEstimationTime(this.state.estimatedTime)
-                    }
-                    disabled={!this.state.estimatedTime}
-                  >
-                    Zatwierdź czas estymacji
-                  </StyledButton>
-                </ConfirmationWrapper>
-              ) : (
-                <div>Poczekaj aż wszyscy uczestnicy zaproponują czas</div>
-              )
+            isAllMembersProposedEstimationTime ? (
+              <ConfirmationWrapper>
+                <StyledInput
+                  type="number"
+                  onChange={({ target: { value } }) =>
+                    this.changeEstimationTime(value)
+                  }
+                  value={this.state.estimatedTime}
+                />
+                <StyledButton
+                  onClick={() =>
+                    confirmEstimationTime(this.state.estimatedTime)
+                  }
+                  disabled={!this.state.estimatedTime}
+                >
+                  Zatwierdź czas estymacji
+                </StyledButton>
+              </ConfirmationWrapper>
+            ) : isEstimating ? (
+              <div>Poczekaj aż wszyscy uczestnicy zaproponują czas</div>
             ) : (
               <StyledButton onClick={startEstimating}>
                 Rozpocznij estymację

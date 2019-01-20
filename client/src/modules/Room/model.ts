@@ -17,7 +17,7 @@ export interface Task {
 }
 
 export interface ProposeEstimationTime {
-  ConnectionId: string;
+  connectionId: string;
   estimationTimePropose?: number;
 }
 
@@ -31,58 +31,10 @@ export interface RoomModelState {
 
 const initState: RoomModelState = {
   status: "duringPlanning",
-  members: [
-    { ConnectionId: "a1", Nick: "Ryszard", Role: MemberRole.Admin },
-    { ConnectionId: "m1", Nick: "Mateusz", Role: MemberRole.Member },
-    { ConnectionId: "m2", Nick: "Jan", Role: MemberRole.Member },
-    { ConnectionId: "m3", Nick: "Adam", Role: MemberRole.Member }
-  ],
+  members: [],
   isEstimating: false,
-  proposeEstimationTime: [
-    { ConnectionId: "a1", estimationTimePropose: 2 },
-    { ConnectionId: "m1", estimationTimePropose: 3 },
-    { ConnectionId: "m2" },
-    { ConnectionId: "m3" }
-  ],
-  tasks: [
-    {
-      id: 1,
-      title: "abc 1",
-      status: TaskStatus.notEstimated
-    },
-    {
-      id: 2,
-      title: "abc 2",
-      status: TaskStatus.estimated,
-      estimatedTime: 7
-    },
-    {
-      id: 3,
-      title: "abc 3",
-      status: TaskStatus.estimated,
-      estimatedTime: 5
-    },
-    {
-      id: 4,
-      title: "abc 4",
-      status: TaskStatus.notEstimated
-    },
-    {
-      id: 5,
-      title: "abc 5",
-      status: TaskStatus.notEstimated
-    },
-    {
-      id: 6,
-      title: "abc 6",
-      status: TaskStatus.notEstimated
-    },
-    {
-      id: 7,
-      title: "abc 7",
-      status: TaskStatus.notEstimated
-    }
-  ]
+  proposeEstimationTime: [],
+  tasks: []
 };
 
 export const RoomModel = createModel({
@@ -101,11 +53,37 @@ export const RoomModel = createModel({
     changeTask(state, newTask: Task) {
       const tasks = [...state.tasks];
       const taskIndex = tasks.findIndex(t => t.id === newTask.id);
-      tasks[taskIndex] = newTask;
-      return { ...state, tasks };
+      if (taskIndex > -1) {
+        tasks[taskIndex] = newTask;
+      }
+      return { ...state, tasks, proposeEstimationTime: [] };
     },
     setEstimating(state, value: boolean) {
       return { ...state, isEstimating: value };
+    },
+    proposeEstimationTime(
+      state,
+      proposedEstimationTime: ProposeEstimationTime
+    ) {
+      const proposeEstimationTime = [...state.proposeEstimationTime];
+      const elementIndex = proposeEstimationTime.findIndex(
+        p => p.connectionId === proposedEstimationTime.connectionId
+      );
+      if (elementIndex > -1) {
+        proposeEstimationTime[elementIndex] = proposedEstimationTime;
+      } else {
+        proposeEstimationTime.push(proposedEstimationTime);
+      }
+      return {
+        ...state,
+        proposeEstimationTime
+      };
+    },
+    clearProposeEstimationTimeList(state) {
+      return {
+        ...state,
+        proposeEstimationTime: []
+      };
     }
   }
 });

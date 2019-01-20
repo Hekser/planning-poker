@@ -41,7 +41,7 @@ const mapState = (state: RootState) => {
   return {
     tasks: state.room.tasks,
     amIAdmin:
-      (roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId) || true
+      (roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId)
   };
 };
 

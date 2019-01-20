@@ -26,7 +26,7 @@ const Table: FunctionComponent<Props> = ({
     {estimatingTask && (
       <>
         <TaskTitle>{estimatingTask.title}</TaskTitle>
-        {isEstimating && <MemberList />}
+        <MemberList />
         {amIAdmin && <AdminPanel isEstimating={isEstimating} />}
       </>
     )}
@@ -39,8 +39,7 @@ const mapState = (state: RootState) => {
     estimatingTask: state.room.tasks.find(
       t => t.status === TaskStatus.duringEstimation
     ),
-    amIAdmin:
-      (roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId) || true,
+    amIAdmin: roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId,
     isEstimating: state.room.isEstimating
   };
 };

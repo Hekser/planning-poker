@@ -5,7 +5,7 @@ import { PaneStyles } from "../../../Common/styles";
 export const Wrapper = styled.div`
   display: grid;
   grid-template-columns: auto 400px;
-  grid-template-rows: auto 100px 150px;
+  grid-template-rows: auto 30px 220px;
   width: 96%;
   height: 96%;
   grid-gap: 1%;
@@ -31,9 +31,8 @@ export const MembersListWrapper = styled.div`
   overflow: hidden;
 `;
 
-export const CardsPanel = styled.div`
+export const CardsWrapper = styled.div`
   grid-column: 1;
   grid-row: 3;
   overflow: hidden;
-  border: 1px dotted black;
 `;

@@ -3,13 +3,14 @@ import React, { Component } from "react";
 import {
   Wrapper,
   MainWindow,
-  CardsPanel,
+  CardsWrapper,
   MembersListWrapper,
   TasksWrapper
 } from "./styled";
 import MembersList from "../MembersList";
 import Tasks from "./Tasks";
 import Table from "./Table";
+import Cards from "./Cards";
 
 export class DuringPlanning extends Component {
   render() {
@@ -21,7 +22,9 @@ export class DuringPlanning extends Component {
         <TasksWrapper>
           <Tasks />
         </TasksWrapper>
-        <CardsPanel>_CARDS_</CardsPanel>
+        <CardsWrapper>
+          <Cards />
+        </CardsWrapper>
         <MembersListWrapper>
           <MembersList />
         </MembersListWrapper>

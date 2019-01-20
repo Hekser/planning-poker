@@ -21,13 +21,13 @@ const MemberList: FunctionComponent<Props> = ({
   <Wrapper>
     {members.map(m => {
       const proposed = proposeEstimationTime.find(
-        p => m.ConnectionId === p.ConnectionId
+        p => m.ConnectionId === p.connectionId
       );
       return (
         <Element
           memberNick={m.Nick}
           isEstimated={!!proposed}
-          estimatedTime={proposed.estimationTimePropose}
+          estimatedTime={proposed && proposed.estimationTimePropose}
         />
       );
     })}
