@@ -31,7 +31,9 @@ namespace PlanningPoker.Logic.Services
 				{
 					RoomName = roomName,
 					Members = new List<Member>() { member },
-					RoomId = nextRoomId++
+					RoomId = nextRoomId++,
+					Tasks = new List<Task>(),
+					ProposeEstimations = new List<ProposeEstimationTime>()
 				}
 			);
 		}
@@ -45,9 +47,7 @@ namespace PlanningPoker.Logic.Services
 
 		public IEnumerable<Member> GetRoomMembers(string roomName)
 		{
-			validator.CheckIfRoomNameExists(Rooms, roomName);
-
-			return Rooms.First(x => x.RoomName == roomName).Members;
+			return Rooms.FirstOrDefault(x => x.RoomName == roomName)?.Members ?? new List<Member>();
 		}
 
 		public void StartPlanning(string connectionId, Room room)
