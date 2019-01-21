@@ -85,8 +85,11 @@ namespace PlanningPoker.Hubs
       Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
-        var task = storage.ChangeStatus(Context.ConnectionId, room, id, taskStatus);
-        await Clients.Group(room.RoomName).SendAsync("TaskChanged", task);
+        var tasks = storage.ChangeStatus(Context.ConnectionId, room, id, taskStatus);
+        foreach (var task in tasks)
+        {
+          await Clients.Group(room.RoomName).SendAsync("TaskChanged", task);
+        }
       });
     }
 

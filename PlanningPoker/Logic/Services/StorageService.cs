@@ -71,25 +71,22 @@ namespace PlanningPoker.Logic.Services
 			return task;
         }
 
-		public Task ChangeStatus(string connectionId, Room room, int taskId, TaskStatus taskStatus)
+		public IEnumerable<Task> ChangeStatus(string connectionId, Room room, int taskId, TaskStatus taskStatus)
 		{
 			CheckAdminPermission(connectionId, room);
 			var task = room.Tasks.FirstOrDefault(x => x.Id == taskId);
+			var tasks = new List<Task>();
 			if (task == null) { validator.Throw("Task nie istnieje!"); }
 			if (taskStatus == TaskStatus.DuringEstimation && room.Tasks.Any(x => x.Status == TaskStatus.DuringEstimation))
 			{
-				foreach (var item in room.Tasks)
-				{
-					if (item.Status == TaskStatus.DuringEstimation)
-					{
-						item.Status = TaskStatus.NotEstimated;
-					}
-				}
-
+				var item = room.Tasks.First(x => x.Status == TaskStatus.DuringEstimation);
+				item.Status = TaskStatus.NotEstimated;
+				tasks.Add(item);
 				room.ProposeEstimations = new List<ProposeEstimationTime>();
 			}
 			task.Status = taskStatus;
-			return task;
+			tasks.Add(task);
+			return tasks;
 		}
 
 		public void StartEstimating(string connectionId, Room room)
