@@ -145,8 +145,7 @@ class WithSignalRComponent extends Component<
       });
 
       WithSignalRComponent.connection.on("errorOccured", (errorMsg: string) => {
-        // TODO: set room status to finished
-        NotificationManager.error("Wystąpił błąd", errorMsg);
+        NotificationManager.error(errorMsg, "Wystąpił błąd");
       });
 
       WithSignalRComponent.connection.start();
