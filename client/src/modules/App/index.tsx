@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
+import { NotificationContainer } from "react-notifications";
+import 'react-notifications/lib/notifications.css';
 
 import "./style.css";
 import { Chat } from "../Chat/Chat";
@@ -20,6 +22,7 @@ class App extends Component {
               <Route path={ROOM_PATH} component={Room} />
               <Route path="/" component={Room} />
             </Switch>
+            <NotificationContainer />
           </AppWrapper>
         </BrowserRouter>
       </Provider>

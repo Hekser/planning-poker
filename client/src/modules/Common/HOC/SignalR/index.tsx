@@ -2,6 +2,7 @@ import React, { Component, ReactNode } from "react";
 import * as SignalR from "@aspnet/signalr";
 import { withRouter, RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
+import { NotificationManager } from "react-notifications";
 
 import { ROOM_PATH, ENTRY_ROOM_PATH } from "../../../../config/paths";
 import { RootState, Dispatch } from "../../../../config/rematch";
@@ -92,6 +93,7 @@ class WithSignalRComponent extends Component<
 
       WithSignalRComponent.connection.on("createRoom", res => {
         history.push(ENTRY_ROOM_PATH);
+
         this.refreshRoom({ roomName: res });
       });
 
@@ -132,7 +134,6 @@ class WithSignalRComponent extends Component<
       WithSignalRComponent.connection.on(
         "estimationFinished",
         (proposedEstimationTime: ProposeEstimationTime[]) => {
-          console.log(proposedEstimationTime);
           setEstimating(false);
           proposedEstimationTime.map(it => proposeEstimationTime(it));
         }
@@ -141,6 +142,11 @@ class WithSignalRComponent extends Component<
       WithSignalRComponent.connection.on("planningFinished", () => {
         // TODO: set room status to finished
         console.log("planningFinished");
+      });
+
+      WithSignalRComponent.connection.on("errorOccured", (errorMsg: string) => {
+        // TODO: set room status to finished
+        NotificationManager.error("Wystąpił błąd", errorMsg);
       });
 
       WithSignalRComponent.connection.start();
