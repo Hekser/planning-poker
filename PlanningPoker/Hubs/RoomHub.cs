@@ -144,18 +144,20 @@ namespace PlanningPoker.Hubs
 
     private System.Threading.Tasks.Task Execute(Action action)
     {
-      try
-      {
-        return System.Threading.Tasks.Task.Run(() => action());
-      }
-      catch (HubException ex)
-      {
-        return Clients.Caller.SendAsync("ErrorOccured", ex.Message);
-      }
-      catch (Exception)
-      {
-        return Clients.Caller.SendAsync("ErrorOccured", "Ups! Coś poszło nie tak!");
-      }
+      return System.Threading.Tasks.Task.Run(() => {
+        try
+        {
+          action(); 
+        }
+        catch (HubException ex)
+        {
+          Clients.Caller.SendAsync("ErrorOccured", ex.Message);
+        }
+        catch (Exception)
+        {
+          Clients.Caller.SendAsync("ErrorOccured", "Ups! Coś poszło nie tak!");
+        }
+      });
     }
   }
 }
