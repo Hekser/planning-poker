@@ -22,7 +22,7 @@ namespace PlanningPoker.Hubs
     public override async System.Threading.Tasks.Task OnDisconnectedAsync(Exception exception)
     {
       var roomName = storage.RemoveMember(Context.ConnectionId);
-      await this.RefreshRoom(roomName);
+      this.RefreshRoom(roomName);
       await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);
       await base.OnDisconnectedAsync(exception);
     }
@@ -32,9 +32,9 @@ namespace PlanningPoker.Hubs
       await Clients.All.SendAsync("ReceiveMessage", user, message);
     }
 
-    public async System.Threading.Tasks.Task CreateRoom(string nickName, string roomName)
+    public void CreateRoom(string nickName, string roomName)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         storage.CreateRoom(roomName, new Member() { Nick = nickName, Role = Role.Admin, ConnectionId = Context.ConnectionId });
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
@@ -42,9 +42,9 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task JoinRoom(string nickName, string roomName)
+    public void JoinRoom(string nickName, string roomName)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         storage.AddMember(roomName, new Member() { Nick = nickName, Role = Role.Member, ConnectionId = Context.ConnectionId });
         await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
@@ -52,17 +52,17 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task RefreshRoom(string roomName)
+    public void RefreshRoom(string roomName)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         await Clients.Group(roomName).SendAsync("RefreshRoom", JsonConvert.SerializeObject(storage.GetRoomMembers(roomName)));
       });
     }
 
-    public async System.Threading.Tasks.Task StartPlanning()
+    public void StartPlanning()
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         storage.StartPlanning(Context.ConnectionId, room);
@@ -70,9 +70,9 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task AddTask(string name)
+    public void AddTask(string name)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         var task = storage.AddTask(Context.ConnectionId, room, name);
@@ -80,9 +80,9 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task ChangeTaskStatus(int id, Models.TaskStatus taskStatus)
+    public void ChangeTaskStatus(int id, Models.TaskStatus taskStatus)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         var task = storage.ChangeStatus(Context.ConnectionId, room, id, taskStatus);
@@ -90,9 +90,9 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task StartEstimating()
+    public void StartEstimating()
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         storage.StartEstimating(Context.ConnectionId, room);
@@ -100,9 +100,9 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task ProposeEstimationTime(int estimatedTime)
+    public void ProposeEstimationTime(int estimatedTime)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         var response = storage.ProposeEstimationTime(Context.ConnectionId, room, estimatedTime);
@@ -118,9 +118,9 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task ConfirmEstimationTime(int estimatedTime)
+    public void ConfirmEstimationTime(int estimatedTime)
     {
-      await Execute(async () =>
+      Execute(async () =>
       {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         var task = storage.ConfirmEstimationTime(Context.ConnectionId, room, estimatedTime);
@@ -128,36 +128,34 @@ namespace PlanningPoker.Hubs
       });
     }
 
-    public async System.Threading.Tasks.Task FinishPlanning()
+    public void FinishPlanning()
     {
-      await Execute(async () => {
+      Execute(async () => {
         var room = storage.GetMembersRoom(Context.ConnectionId);
         storage.FinishPlanning(Context.ConnectionId, room);
         await Clients.Group(room.RoomName).SendAsync("PlanningFinished");
       });
     }
 
-    public async System.Threading.Tasks.Task LeaveRoom(string roomName)
+    public void LeaveRoom(string roomName)
     {
-      await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);
+      Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);
     }
 
-    private System.Threading.Tasks.Task Execute(Action action)
+    private async void Execute(Func<System.Threading.Tasks.Task> action)
     {
-      return System.Threading.Tasks.Task.Run(() => {
-        try
-        {
-          action(); 
-        }
-        catch (HubException ex)
-        {
-          Clients.Caller.SendAsync("ErrorOccured", ex.Message);
-        }
-        catch (Exception)
-        {
-          Clients.Caller.SendAsync("ErrorOccured", "Ups! Coś poszło nie tak!");
-        }
-      });
+      try
+      {
+        await action();
+      }
+      catch (PlanningPoker.Exceptions.HubException ex)
+      {
+        await Clients.Caller.SendAsync("ErrorOccured", ex.Message);
+      }
+      catch (Exception)
+      {
+        await Clients.Caller.SendAsync("ErrorOccured", "Ups! Coś poszło nie tak!");
+      }
     }
   }
 }
