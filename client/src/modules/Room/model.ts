@@ -1,6 +1,5 @@
 import { createModel } from "@rematch/core";
-
-import { Member } from "../Common/HOC/SignalR";
+import { Member, MemberRole } from "../Common/HOC/SignalR/interfaces";
 
 export type RoomStatus = "beforeStart" | "duringPlanning" | "planningFinished";
 
@@ -17,61 +16,25 @@ export interface Task {
   estimatedTime?: number;
 }
 
+export interface ProposeEstimationTime {
+  connectionId: string;
+  estimationTimePropose?: number;
+}
+
 export interface RoomModelState {
   status: RoomStatus;
   members: Member[];
   tasks: Task[];
+  isEstimating: boolean;
+  proposeEstimationTime: ProposeEstimationTime[];
 }
 
 const initState: RoomModelState = {
   status: "duringPlanning",
   members: [],
-  tasks: [
-    // {
-    //   id: 1,
-    //   title:
-    //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    //   status: TaskStatus.notEstimated
-    // },
-    // {
-    //   id: 2,
-    //   title:
-    //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    //   status: TaskStatus.notEstimated,
-    //   estimatedTime: 7
-    // },
-    // {
-    //   id: 3,
-    //   title:
-    //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    //   status: TaskStatus.notEstimated,
-    //   estimatedTime: 5
-    // },
-    // {
-    //   id: 4,
-    //   title:
-    //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    //   status: TaskStatus.notEstimated
-    // },
-    // {
-    //   id: 5,
-    //   title:
-    //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    //   status: TaskStatus.notEstimated
-    // },
-    // {
-    //   id: 6,
-    //   title:
-    //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    //   status: TaskStatus.notEstimated
-    // },
-    // // {
-    // //   id: 7,
-    // //   title:
-    // //     "Lorem Ipsum jest tekstem stosowanym jako przykładowy wypełniacz w przemyśle poligraficznym.",
-    // //   status: TaskStatus.notEstimated
-    // // }
-  ]
+  isEstimating: false,
+  proposeEstimationTime: [],
+  tasks: []
 };
 
 export const RoomModel = createModel({
@@ -88,10 +51,39 @@ export const RoomModel = createModel({
       return { ...state, tasks: [...state.tasks, task] };
     },
     changeTask(state, newTask: Task) {
-      const tasks = state.tasks;
+      const tasks = [...state.tasks];
       const taskIndex = tasks.findIndex(t => t.id === newTask.id);
-      tasks[taskIndex] = newTask;
-      return { ...state, tasks };
+      if (taskIndex > -1) {
+        tasks[taskIndex] = newTask;
+      }
+      return { ...state, tasks, proposeEstimationTime: [] };
+    },
+    setEstimating(state, value: boolean) {
+      return { ...state, isEstimating: value };
+    },
+    proposeEstimationTime(
+      state,
+      proposedEstimationTime: ProposeEstimationTime
+    ) {
+      const proposeEstimationTime = [...state.proposeEstimationTime];
+      const elementIndex = proposeEstimationTime.findIndex(
+        p => p.connectionId === proposedEstimationTime.connectionId
+      );
+      if (elementIndex > -1) {
+        proposeEstimationTime[elementIndex] = proposedEstimationTime;
+      } else {
+        proposeEstimationTime.push(proposedEstimationTime);
+      }
+      return {
+        ...state,
+        proposeEstimationTime
+      };
+    },
+    clearProposeEstimationTimeList(state) {
+      return {
+        ...state,
+        proposeEstimationTime: []
+      };
     }
   }
 });

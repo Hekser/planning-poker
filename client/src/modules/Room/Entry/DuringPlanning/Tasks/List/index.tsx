@@ -2,22 +2,35 @@ import React, { FunctionComponent } from "react";
 import { connect } from "react-redux";
 
 import { Wrapper } from "./styled";
-import { Task } from "../../../../model";
+import { Task, TaskStatus } from "../../../../model";
 import { RootState } from "../../../../../../config/rematch";
 import Element from "./Element";
-import { MemberRole, WithSignalR } from "../../../../../Common/HOC/SignalR";
+import { WithSignalR } from "../../../../../Common/HOC/SignalR";
+import { MemberRole } from "../../../../../Common/HOC/SignalR/interfaces";
 
 interface Props {
   tasks: Task[];
+  amIAdmin: boolean;
 }
 
-const List: FunctionComponent<Props> = ({ tasks }) => (
+const List: FunctionComponent<Props> = ({ tasks, amIAdmin }) => (
   <Wrapper>
     <WithSignalR>
-      {({}) =>
-        tasks.map(t => (
-          <Element task={t} startEstimateTask={e => console.log(e)} />
-        ))
+      {({ changeTaskStatus }) =>
+        tasks
+          .filter(t => t.status !== TaskStatus.duringEstimation)
+          .sort((a, b) => a.status - b.status)
+          .map(t => (
+            <Element
+              key={t.id}
+              task={t}
+              startEstimateTask={
+                amIAdmin
+                  ? e => changeTaskStatus(e, TaskStatus.duringEstimation)
+                  : undefined
+              }
+            />
+          ))
       }
     </WithSignalR>
   </Wrapper>
@@ -27,7 +40,8 @@ const mapState = (state: RootState) => {
   const roomAdmin = state.room.members.find(m => m.Role === MemberRole.Admin);
   return {
     tasks: state.room.tasks,
-    amIAdmin: roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId
+    amIAdmin:
+      (roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId)
   };
 };
 

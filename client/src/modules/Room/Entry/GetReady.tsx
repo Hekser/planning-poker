@@ -7,10 +7,11 @@ import {
   GetReadyWrapper,
   GetReadyDescription
 } from "./styled";
-import { Member, MemberRole, WithSignalR } from "../../Common/HOC/SignalR";
+import { WithSignalR } from "../../Common/HOC/SignalR";
 import { RootState, Dispatch } from "../../../config/rematch";
 import MembersList from "./MembersList";
 import { RoomStatus } from "../model";
+import { Member, MemberRole } from "../../Common/HOC/SignalR/interfaces";
 
 export interface GetReadyProps {
   connectionId: string;
