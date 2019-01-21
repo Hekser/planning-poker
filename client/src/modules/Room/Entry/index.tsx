@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { withRouter, RouteComponentProps } from "react-router";
 
 import { GetReady } from "./GetReady";
-import { DuringPlanning } from "./DuringPlanning";
+import DuringPlanning from "./DuringPlanning";
 import { RoomStatus } from "../model";
 import { connect } from "react-redux";
 import { RootState } from "../../../config/rematch";
+import PlanningFinished from "./PlanningFinished";
 
 export interface RoomEntryState {}
 
@@ -21,6 +22,8 @@ class RoomEntryComponent extends Component<RoomEntryProps, RoomEntryState> {
         return <GetReady />;
       case "duringPlanning":
         return <DuringPlanning />;
+      case "planningFinished":
+        return <PlanningFinished />;
     }
   }
 }

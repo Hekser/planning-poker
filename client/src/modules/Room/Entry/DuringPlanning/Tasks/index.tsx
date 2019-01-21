@@ -4,27 +4,18 @@ import { connect } from "react-redux";
 import { Wrapper, Content } from "./styled";
 import Toolbar from "./Toolbar";
 import List from "./List";
-import { RootState } from "../../../../../config/rematch";
-import { MemberRole } from "../../../../Common/HOC/SignalR/interfaces";
 
 interface Props {
-  amIAdmin: boolean;
+  displayToolbar: boolean;
 }
 
-const Tasks: FunctionComponent<Props> = ({ amIAdmin }) => (
+const Tasks: FunctionComponent<Props> = ({ displayToolbar }) => (
   <Wrapper>
     <Content>
-      <List />
+      <List displayAdminButtons={displayToolbar} />
     </Content>
-    {amIAdmin && <Toolbar />}
+    {displayToolbar && <Toolbar />}
   </Wrapper>
 );
 
-const mapState = (state: RootState) => {
-  const roomAdmin = state.room.members.find(m => m.Role === MemberRole.Admin);
-  return {
-    amIAdmin: roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId
-  };
-};
-
-export default connect(mapState)(Tasks);
+export default Tasks;

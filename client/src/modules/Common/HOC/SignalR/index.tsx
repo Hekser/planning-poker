@@ -93,7 +93,6 @@ class WithSignalRComponent extends Component<
 
       WithSignalRComponent.connection.on("createRoom", res => {
         history.push(ENTRY_ROOM_PATH);
-
         this.refreshRoom({ roomName: res });
       });
 
@@ -140,8 +139,7 @@ class WithSignalRComponent extends Component<
       );
 
       WithSignalRComponent.connection.on("planningFinished", () => {
-        // TODO: set room status to finished
-        console.log("planningFinished");
+        changeStatus("planningFinished");
       });
 
       WithSignalRComponent.connection.on("errorOccured", (errorMsg: string) => {

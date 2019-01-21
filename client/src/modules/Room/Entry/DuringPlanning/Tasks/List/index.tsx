@@ -6,14 +6,13 @@ import { Task, TaskStatus } from "../../../../model";
 import { RootState } from "../../../../../../config/rematch";
 import Element from "./Element";
 import { WithSignalR } from "../../../../../Common/HOC/SignalR";
-import { MemberRole } from "../../../../../Common/HOC/SignalR/interfaces";
 
 interface Props {
   tasks: Task[];
-  amIAdmin: boolean;
+  displayAdminButtons: boolean;
 }
 
-const List: FunctionComponent<Props> = ({ tasks, amIAdmin }) => (
+const List: FunctionComponent<Props> = ({ tasks, displayAdminButtons }) => (
   <Wrapper>
     <WithSignalR>
       {({ changeTaskStatus }) =>
@@ -25,7 +24,7 @@ const List: FunctionComponent<Props> = ({ tasks, amIAdmin }) => (
               key={t.id}
               task={t}
               startEstimateTask={
-                amIAdmin
+                displayAdminButtons
                   ? e => changeTaskStatus(e, TaskStatus.duringEstimation)
                   : undefined
               }
@@ -37,11 +36,8 @@ const List: FunctionComponent<Props> = ({ tasks, amIAdmin }) => (
 );
 
 const mapState = (state: RootState) => {
-  const roomAdmin = state.room.members.find(m => m.Role === MemberRole.Admin);
   return {
-    tasks: state.room.tasks,
-    amIAdmin:
-      (roomAdmin && roomAdmin.ConnectionId === state.user.ConnectionId)
+    tasks: state.room.tasks
   };
 };
 
