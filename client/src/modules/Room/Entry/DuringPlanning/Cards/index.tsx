@@ -16,6 +16,7 @@ const Cards: FunctionComponent<Props> = ({ isEstimating }) => (
       {({ proposeEstimationTime }) =>
         [1, 2, 3, 5, 8].map(v => (
           <Card
+            key={v}
             value={v}
             onClick={() => proposeEstimationTime(v)}
             disabled={!isEstimating}

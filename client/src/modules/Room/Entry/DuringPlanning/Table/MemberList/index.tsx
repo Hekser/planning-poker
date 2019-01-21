@@ -25,6 +25,7 @@ const MemberList: FunctionComponent<Props> = ({
       );
       return (
         <Element
+          key={m.ConnectionId}
           memberNick={m.Nick}
           isEstimated={!!proposed}
           estimatedTime={proposed && proposed.estimationTimePropose}
