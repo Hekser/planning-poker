@@ -12,8 +12,7 @@ import {
   ProposeEstimationTime
 } from "../../../Room/model";
 import { Member } from "./interfaces";
-
-const HUB_URL = "http://localhost:7000/roomHub";
+import { HUB_URL } from "../../../../config/const";
 
 type CreateRoomMethod = (nickname: string, roomName: string) => void;
 type JoinRoomMethod = (values: { nickname: string; roomName: string }) => void;
